@@ -1,0 +1,59 @@
+<div class="rounded-xl border border-gray-200 bg-white p-4">
+
+  <div class="mb-4">
+    <h4 class="text-sm font-semibold text-gray-800">
+      Definition
+    </h4>
+
+    <p class="text-xs text-gray-500">
+      Explain a term or concept
+    </p>
+  </div>
+
+  <div class="space-y-4">
+
+    <div>
+      <label class="mb-1 block text-xs font-medium text-gray-700">
+        Term
+      </label>
+
+      <input
+        type="text"
+        [value]="data.term || ''"
+        (input)="updateField('term', $any($event.target).value)"
+        placeholder="e.g. Dependency Injection"
+        class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+      />
+    </div>
+
+    <div>
+      <label class="mb-1 block text-xs font-medium text-gray-700">
+        Definition
+      </label>
+
+      <textarea
+        rows="4"
+        [value]="data.definition || ''"
+        (input)="updateField('definition', $any($event.target).value)"
+        placeholder="Write the definition..."
+        class="w-full resize-y rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+      ></textarea>
+    </div>
+
+    <div>
+      <label class="mb-1 block text-xs font-medium text-gray-700">
+        Example
+      </label>
+
+      <textarea
+        rows="3"
+        [value]="data.example || ''"
+        (input)="updateField('example', $any($event.target).value)"
+        placeholder="Give an example..."
+        class="w-full resize-y rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+      ></textarea>
+    </div>
+
+  </div>
+
+</div>

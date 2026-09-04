@@ -1,0 +1,4 @@
+import { Component } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { DummyDataService } from '../../../../core/data/dummy-data.service';
+@Component({selector:'app-lesson',imports:[RouterLink],templateUrl:'./lesson.html',styleUrl:'./lesson.css'}) export class Lesson { topic:any; lesson:any; index=0; constructor(route:ActivatedRoute,public data:DummyDataService){const topicSlug=route.snapshot.paramMap.get('topic')||'csharp';const lessonSlug=route.snapshot.paramMap.get('lesson')||'introduction';const result=data.getLesson(topicSlug,lessonSlug)||data.getLesson('csharp','introduction')!;this.topic=result!.topic;this.lesson=result!.lesson;this.index=this.topic.lessons.findIndex((l:any)=>l.slug===this.lesson.slug);} get previous(){return this.index>0?this.topic.lessons[this.index-1]:null;} get next(){return this.index<this.topic.lessons.length-1?this.topic.lessons[this.index+1]:null;} }

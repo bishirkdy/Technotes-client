@@ -1,0 +1,47 @@
+<div
+  class="group flex items-center gap-2 rounded-lg px-2 py-2 hover:bg-gray-50"
+  [style.padding-left.px]="level * 16"
+>
+
+  @if (isEditing) {
+
+    <input
+      type="text"
+      [value]="title"
+      (blur)="finishEditing($any($event.target).value)"
+      (keyup.enter)="finishEditing($any($event.target).value)"
+      autofocus
+      class="min-w-0 flex-1 rounded border border-gray-300 px-2 py-1 text-sm outline-none"
+    />
+
+  } @else {
+
+    <button
+      type="button"
+      (click)="startEditing()"
+      class="min-w-0 flex-1 truncate text-left text-sm text-gray-700"
+    >
+      {{ title }}
+    </button>
+
+  }
+
+  <button
+    type="button"
+    (click)="addChild.emit()"
+    class="hidden rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-200 group-hover:block"
+    title="Add subsection"
+  >
+    +
+  </button>
+
+  <button
+    type="button"
+    (click)="delete.emit()"
+    class="hidden rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 group-hover:block"
+    title="Delete section"
+  >
+    ×
+  </button>
+
+</div>

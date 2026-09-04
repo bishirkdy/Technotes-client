@@ -1,0 +1,89 @@
+<div class="space-y-4">
+  <!-- Header -->
+  <div>
+    <h3 class="text-sm font-semibold text-gray-800">Content</h3>
+
+    <p class="text-xs text-gray-500">Add and organize your note content</p>
+  </div>
+
+  <!-- Dynamic Blocks -->
+  <div class="space-y-4">
+    @for (block of blocks; track block.id; let i = $index) {
+      <div>
+        @switch (block.type) {
+          @case ('text') {
+            <app-text-block [data]="block.data" (dataChange)="block.data = $event" />
+          }
+
+          @case ('definition') {
+            <app-definition-block [data]="block.data" (dataChange)="block.data = $event" />
+          }
+
+          @case ('points') {
+            <app-points-block [data]="block.data" (dataChange)="block.data = $event" />
+          }
+
+          @case ('example') {
+            <app-example-block [data]="block.data" (dataChange)="block.data = $event" />
+          }
+
+          @case ('code') {
+            <app-code-block [data]="block.data" (dataChange)="block.data = $event" />
+          }
+
+          @case ('table') {
+            <app-table-block [data]="block.data" (dataChange)="block.data = $event" />
+          }
+
+          @case ('graph') {
+            <app-graph-block [data]="block.data" (dataChange)="block.data = $event" />
+          }
+
+          @case ('quote') {
+            <app-quote-block [data]="block.data" (dataChange)="block.data = $event" />
+          }
+        }
+        <!-- Block Controls -->
+        <div class="mt-2 flex justify-end gap-1">
+          <button
+            type="button"
+            (click)="moveUp(i)"
+            [disabled]="i === 0"
+            class="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            ↑ Move up
+          </button>
+
+          <button
+            type="button"
+            (click)="moveDown(i)"
+            [disabled]="i === blocks.length - 1"
+            class="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+          >
+            ↓ Move down
+          </button>
+
+          <button
+            type="button"
+            (click)="removeBlock(block.id)"
+            class="rounded-md border border-gray-200 px-2 py-1 text-xs text-red-500 hover:bg-red-50"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Empty State -->
+  @if (blocks.length === 0) {
+    <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
+      <p class="text-sm font-medium text-gray-600">No content blocks</p>
+
+      <p class="mt-1 text-xs text-gray-400">Add a block to start writing your note.</p>
+    </div>
+  }
+
+  <!-- Toolbar -->
+  <app-content-block-toolbar (blockSelected)="addBlock($event)" />
+</div>

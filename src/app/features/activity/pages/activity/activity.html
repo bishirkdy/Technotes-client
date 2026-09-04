@@ -1,0 +1,19 @@
+<div class="space-y-6">
+  <div>
+    <h1 class="text-3xl font-bold">Activity</h1>
+    <p class="mt-1 text-sm text-gray-500">Recent changes in your workspace.</p>
+  </div>
+  <div class="rounded-2xl border border-gray-200 bg-white p-6">
+    <div class="space-y-6">
+      @for (item of activities; track item[1]) {
+        <div class="flex gap-4">
+          <div class="mt-1 h-2.5 w-2.5 rounded-full bg-gray-900"></div>
+          <div>
+            <p class="text-sm font-medium text-gray-900">{{ item[1] }}</p>
+            <p class="mt-1 text-xs text-gray-400">{{ item[0] }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

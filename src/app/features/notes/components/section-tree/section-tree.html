@@ -1,0 +1,65 @@
+<div class="space-y-1">
+
+  <div class="mb-3 flex items-center justify-between">
+
+    <div>
+      <h3 class="text-sm font-semibold text-gray-800">
+        Sections
+      </h3>
+
+      <p class="text-xs text-gray-500">
+        Organize your note
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="addSection()"
+      class="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium hover:bg-gray-50"
+    >
+      + Section
+    </button>
+
+  </div>
+
+  @for (section of sections; track section.id) {
+
+    <div
+      class="cursor-pointer"
+      (click)="selectSection(section.id)"
+    >
+
+      <app-section-item
+        [title]="section.title"
+        [level]="0"
+        (rename)="renameSection(section.id, $event)"
+        (delete)="deleteSection(section.id)"
+      />
+
+    </div>
+
+  }
+
+  @if (sections.length === 0) {
+
+    <div
+      class="rounded-lg border border-dashed border-gray-300 px-4 py-6 text-center"
+    >
+
+      <p class="text-xs text-gray-500">
+        No sections yet
+      </p>
+
+      <button
+        type="button"
+        (click)="addSection()"
+        class="mt-2 text-xs font-medium text-gray-700 underline"
+      >
+        Add your first section
+      </button>
+
+    </div>
+
+  }
+
+</div>

@@ -1,0 +1,15 @@
+<div class="space-y-8">
+  <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <div><p class="text-sm font-medium text-gray-500">Workspace</p><h1 class="mt-1 text-3xl font-bold text-gray-900">Good afternoon, Bishir</h1><p class="mt-2 text-sm text-gray-500">Your knowledge workspace at a glance.</p></div>
+    <a routerLink="/app/notes/create" class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800">+ Create note</a>
+  </div>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    @for (item of [{label:'Total notes',value:data.notes.length,icon:'📝'},{label:'Published',value:published,icon:'🌐'},{label:'Favorites',value:favorites,icon:'★'},{label:'Total views',value:5420,icon:'◉'}]; track item.label) {
+      <div class="rounded-2xl border border-gray-200 bg-white p-5"><div class="flex items-center justify-between"><span class="text-2xl">{{item.icon}}</span><span class="text-xs text-gray-400">This month</span></div><p class="mt-5 text-2xl font-bold text-gray-900">{{item.value}}</p><p class="mt-1 text-sm text-gray-500">{{item.label}}</p></div>
+    }
+  </div>
+  <div class="grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2 rounded-2xl border border-gray-200 bg-white p-6"><div class="flex items-center justify-between"><div><h2 class="font-semibold text-gray-900">Recent notes</h2><p class="text-sm text-gray-500">Your latest knowledge.</p></div><a routerLink="/app/notes" class="text-sm font-medium text-gray-700">View all →</a></div><div class="mt-5 divide-y divide-gray-100">@for (note of data.notes.slice(0,4); track note.id) {<a [routerLink]="['/notes',note.id]" class="flex items-center justify-between gap-4 py-4 hover:bg-gray-50"><div class="min-w-0"><h3 class="truncate font-medium text-gray-900">{{note.title}}</h3><p class="mt-1 truncate text-sm text-gray-500">{{note.description}}</p></div><span class="shrink-0 text-xs text-gray-400">{{note.updated}}</span></a>}</div></div>
+    <div class="rounded-2xl border border-gray-200 bg-white p-6"><h2 class="font-semibold text-gray-900">Popular topics</h2><div class="mt-5 space-y-4">@for (c of data.categories.slice(0,5); track c.name) {<div><div class="flex justify-between text-sm"><span class="font-medium text-gray-700">{{c.name}}</span><span class="text-gray-400">{{c.count}} notes</span></div><div class="mt-2 h-2 rounded-full bg-gray-100"><div class="h-2 rounded-full bg-gray-800" [style.width.%]="barWidth(c.count)"></div></div></div>}</div></div>
+  </div>
+</div>

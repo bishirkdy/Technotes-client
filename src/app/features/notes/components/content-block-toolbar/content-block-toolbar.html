@@ -1,0 +1,229 @@
+<div class="relative">
+
+  <!-- Add Content Button -->
+  <button
+    type="button"
+    (click)="toggleMenu()"
+    class="flex items-center gap-2 rounded-lg border border-dashed
+           border-gray-300 px-4 py-3 text-sm font-medium text-gray-500
+           transition hover:border-gray-400 hover:bg-gray-50
+           hover:text-gray-900"
+  >
+    <span class="text-lg leading-none">+</span>
+    <span>Add content</span>
+  </button>
+
+
+  <!-- Menu -->
+  @if (isOpen) {
+
+    <div
+      class="absolute bottom-full left-0 z-30 mb-2 w-72 overflow-hidden
+             rounded-xl border border-gray-200 bg-white shadow-lg"
+    >
+
+      <!-- Header -->
+      <div class="border-b border-gray-100 px-4 py-3">
+        <p class="text-sm font-semibold text-gray-900">
+          Add Content
+        </p>
+
+        <p class="mt-1 text-xs text-gray-500">
+          Choose a content block
+        </p>
+      </div>
+
+
+      <!-- Options -->
+      <div class="p-2">
+
+        <!-- Text -->
+        <button
+          type="button"
+          (click)="selectBlock('text')"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-3
+                 text-left hover:bg-gray-50"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center
+                       rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+            T
+          </span>
+
+          <span>
+            <span class="block text-sm font-medium text-gray-900">
+              Text
+            </span>
+            <span class="block text-xs text-gray-500">
+              Write normal content
+            </span>
+          </span>
+        </button>
+
+
+        <!-- Definition -->
+        <button
+          type="button"
+          (click)="selectBlock('definition')"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-3
+                 text-left hover:bg-gray-50"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center
+                       rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+            D
+          </span>
+
+          <span>
+            <span class="block text-sm font-medium text-gray-900">
+              Definition
+            </span>
+            <span class="block text-xs text-gray-500">
+              Explain a concept
+            </span>
+          </span>
+        </button>
+
+
+        <!-- Points -->
+        <button
+          type="button"
+          (click)="selectBlock('points')"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-3
+                 text-left hover:bg-gray-50"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center
+                       rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+            •
+          </span>
+
+          <span>
+            <span class="block text-sm font-medium text-gray-900">
+              Key Points
+            </span>
+            <span class="block text-xs text-gray-500">
+              Create a list of important points
+            </span>
+          </span>
+        </button>
+
+
+        <!-- Example -->
+        <button
+          type="button"
+          (click)="selectBlock('example')"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-3
+                 text-left hover:bg-gray-50"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center
+                       rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+            E
+          </span>
+
+          <span>
+            <span class="block text-sm font-medium text-gray-900">
+              Example
+            </span>
+            <span class="block text-xs text-gray-500">
+              Add a practical example
+            </span>
+          </span>
+        </button>
+
+
+        <!-- Code -->
+        <button
+          type="button"
+          (click)="selectBlock('code')"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-3
+                 text-left hover:bg-gray-50"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center
+                       rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+            &#123;&#125;
+          </span>
+
+          <span>
+            <span class="block text-sm font-medium text-gray-900">
+              Code
+            </span>
+            <span class="block text-xs text-gray-500">
+              Add a code snippet
+            </span>
+          </span>
+        </button>
+
+
+        <!-- Table -->
+        <button
+          type="button"
+          (click)="selectBlock('table')"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-3
+                 text-left hover:bg-gray-50"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center
+                       rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+            ▦
+          </span>
+
+          <span>
+            <span class="block text-sm font-medium text-gray-900">
+              Table
+            </span>
+            <span class="block text-xs text-gray-500">
+              Create structured data
+            </span>
+          </span>
+        </button>
+
+
+        <!-- Graph -->
+        <button
+          type="button"
+          (click)="selectBlock('graph')"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-3
+                 text-left hover:bg-gray-50"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center
+                       rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+            ◇
+          </span>
+
+          <span>
+            <span class="block text-sm font-medium text-gray-900">
+              Graph
+            </span>
+            <span class="block text-xs text-gray-500">
+              Visualize information
+            </span>
+          </span>
+        </button>
+
+
+        <!-- Quote -->
+        <button
+          type="button"
+          (click)="selectBlock('quote')"
+          class="flex w-full items-center gap-3 rounded-lg px-3 py-3
+                 text-left hover:bg-gray-50"
+        >
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center
+                       rounded-lg bg-gray-100 text-sm font-semibold text-gray-700">
+            “
+          </span>
+
+          <span>
+            <span class="block text-sm font-medium text-gray-900">
+              Quote
+            </span>
+            <span class="block text-xs text-gray-500">
+              Highlight important text
+            </span>
+          </span>
+        </button>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

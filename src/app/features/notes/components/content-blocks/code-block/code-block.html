@@ -1,0 +1,92 @@
+<div class="rounded-xl border border-gray-200 bg-white p-4">
+
+  <div class="mb-4">
+    <h4 class="text-sm font-semibold text-gray-800">
+      Code
+    </h4>
+
+    <p class="text-xs text-gray-500">
+      Add a code snippet
+    </p>
+  </div>
+
+  <div class="space-y-4">
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+      <div>
+        <label class="mb-1 block text-xs font-medium text-gray-700">
+          Language
+        </label>
+
+        <select
+          [value]="data.language || 'csharp'"
+          (change)="updateField('language', $any($event.target).value)"
+          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        >
+          <option value="csharp">C#</option>
+          <option value="typescript">TypeScript</option>
+          <option value="javascript">JavaScript</option>
+          <option value="sql">SQL</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="json">JSON</option>
+          <option value="bash">Bash</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="mb-1 block text-xs font-medium text-gray-700">
+          Filename
+        </label>
+
+        <input
+          type="text"
+          [value]="data.filename || ''"
+          (input)="updateField('filename', $any($event.target).value)"
+          placeholder="Program.cs"
+          class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+        />
+      </div>
+
+    </div>
+
+    <div>
+      <label class="mb-1 block text-xs font-medium text-gray-700">
+        Code
+      </label>
+
+      <textarea
+        rows="10"
+        [value]="data.code || ''"
+        (input)="updateField('code', $any($event.target).value)"
+        placeholder="Write your code..."
+        class="w-full rounded-lg border border-gray-200 px-3 py-2 font-mono text-sm"
+      ></textarea>
+    </div>
+
+    <div class="flex items-center gap-4">
+
+      <label class="flex items-center gap-2 text-sm text-gray-600">
+        <input
+          type="checkbox"
+          [checked]="data.showLineNumbers ?? true"
+          (change)="updateField('showLineNumbers', $any($event.target).checked)"
+        />
+        Show line numbers
+      </label>
+
+      <label class="flex items-center gap-2 text-sm text-gray-600">
+        <input
+          type="checkbox"
+          [checked]="data.wrapCode ?? false"
+          (change)="updateField('wrapCode', $any($event.target).checked)"
+        />
+        Wrap code
+      </label>
+
+    </div>
+
+  </div>
+
+</div>

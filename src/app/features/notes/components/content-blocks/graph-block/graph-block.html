@@ -1,0 +1,83 @@
+<div class="rounded-xl border border-gray-200 bg-white p-4">
+
+  <div class="mb-4">
+    <h4 class="text-sm font-semibold text-gray-800">
+      Graph
+    </h4>
+
+    <p class="text-xs text-gray-500">
+      Add data for a graph or chart
+    </p>
+  </div>
+
+  <div class="space-y-4">
+
+    <input
+      type="text"
+      [value]="data.title || ''"
+      (input)="updateField('title', $any($event.target).value)"
+      placeholder="Graph title"
+      class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+    />
+
+    <select
+      [value]="data.graphType || 'bar'"
+      (change)="updateField('graphType', $any($event.target).value)"
+      class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+    >
+      <option value="bar">Bar Chart</option>
+      <option value="line">Line Chart</option>
+      <option value="pie">Pie Chart</option>
+    </select>
+
+    <div class="space-y-2">
+
+      @for (row of rows; track $index) {
+        <div class="flex gap-2">
+
+          <input
+            type="text"
+            [value]="row.label"
+            (input)="updateRow($index, 'label', $any($event.target).value)"
+            placeholder="Label"
+            class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          />
+
+          <input
+            type="number"
+            [value]="row.value"
+            (input)="updateRow($index, 'value', $any($event.target).value)"
+            placeholder="Value"
+            class="w-32 rounded-lg border border-gray-200 px-3 py-2 text-sm"
+          />
+
+          <button
+            type="button"
+            (click)="removeRow($index)"
+            class="rounded-lg px-3 text-sm text-red-500"
+          >
+            Remove
+          </button>
+
+        </div>
+      }
+
+    </div>
+
+    <button
+      type="button"
+      (click)="addRow()"
+      class="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+    >
+      + Add Data
+    </button>
+
+    <div class="flex h-48 items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50">
+      <span class="text-sm text-gray-400">
+        Graph preview
+      </span>
+    </div>
+
+  </div>
+
+</div>
