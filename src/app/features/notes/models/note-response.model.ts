@@ -1,16 +1,20 @@
 import { ContentBlockModel } from './content-block.model';
 
-export interface NoteCreateModel {
+export interface NoteResponse {
+  id: string;
   title: string;
+  status: number;
   visibility: number;
+  userId: string;
   folderId: string | null;
   categoryId: string | null;
-  sections: NoteSectionModel[];
+  sections: NoteSectionResponse[];
 }
 
-export interface NoteSectionModel {
+export interface NoteSectionResponse {
+  id: string;
   title: string;
   sortOrder: number;
-  children: NoteSectionModel[];
+  children: NoteSectionResponse[];
   contents: ContentBlockModel[];
 }

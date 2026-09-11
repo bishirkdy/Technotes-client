@@ -1,15 +1,9 @@
-export type ContentBlockType =
-  | 'text'
-  | 'definition'
-  | 'points'
-  | 'example'
-  | 'code'
-  | 'table'
-  | 'graph'
-  | 'quote';
+import { ContentBlockType } from './content-block-type.model';
 
 export interface ContentBlockModel {
-  id: number;
   type: ContentBlockType;
-  data: any;
+  sortOrder: number;
+  content: string | null;
+  data: string | null;
+  metadata: string | null;
 }
