@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DummyDataService } from '../../../../core/data/dummy-data.service';
+
 @Component({
   selector: 'app-learn-home',
   imports: [RouterLink],
@@ -8,5 +8,9 @@ import { DummyDataService } from '../../../../core/data/dummy-data.service';
   styleUrl: './learn-home.css',
 })
 export class LearnHome {
-  constructor(public data: DummyDataService) {}
+  lessons = [
+    { topic: 'C# Basics', slug: 'csharp', description: 'Introduction to C#' },
+    { topic: 'OOP', slug: 'oop', description: 'Object-oriented programming' },
+    { topic: 'Databases', slug: 'databases', description: 'SQL and ORM' },
+  ];
 }

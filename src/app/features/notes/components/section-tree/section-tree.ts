@@ -26,7 +26,8 @@ export class SectionTree {
     const section: NoteSectionModel = {
       id: this.nextId++,
       title: 'New Section',
-      contentBlocks: [],
+      sortOrder: this.sections.length,
+      contents: [],
       children: []
     };
 

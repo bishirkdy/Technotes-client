@@ -5,94 +5,82 @@
       <h1 class="mt-2 text-3xl font-bold text-gray-900">Create Note</h1>
     </div>
     <div class="flex gap-2">
-      <a routerLink="/app/notes" class="rounded-xl border border-gray-200 px-4 py-2.5 text-sm"
-        >Cancel</a
-      ><button
-        (click)="saveNote()"
-        class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white"
-      >
-        Save Note
+      <a routerLink="/app/notes" class="rounded-xl border border-gray-200 px-4 py-2.5 text-sm">Cancel</a>
+      <button (click)="saveNote()" [disabled]="loading" class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+        {{ loading ? 'Saving...' : 'Save Note' }}
       </button>
     </div>
   </div>
-  @if (saved) {
-    <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-      Note saved locally to dummy state.
-    </div>
-  }
-  <div class="grid gap-6 xl:grid-cols-[240px_minmax(0,1fr)_260px]">
+
+  @if (saved) { <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">Note created successfully.</div> }
+  @if (error) { <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }</div> }
+
+  <div class="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)_260px]">
     <aside class="rounded-2xl border border-gray-200 bg-white p-4">
       <div class="flex items-center justify-between">
-        <h2 class="font-semibold">Outline</h2>
-        <button (click)="addSection()"class="text-sm font-semibold">+</button>
+        <div><h2 class="font-semibold">Outline</h2><p class="text-xs text-gray-500">Nested sections</p></div>
+        <button type="button" (click)="addSection()" class="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium">+ Section</button>
       </div>
+
       <div class="mt-4 space-y-1">
-        @for (section of note.sections; track section.id) {
-          <button
-            (click)="selectSection(section.id)"
-            class="w-full rounded-lg px-3 py-2 text-left text-sm"
-            [class.bg-gray-900]="activeSection === section.id"
-            [class.text-white]="activeSection === section.id"
-            [class.text-gray-600]="activeSection !== section.id"
-          >
-            {{ section.title }}
-          </button>
+        @for (item of flattenSections(note.sections); track item.section.id) {
+          <div class="group flex items-center gap-1" [style.padding-left.px]="item.level * 16">
+            <button type="button" (click)="selectSection(item.section.id)" class="min-w-0 flex-1 truncate rounded-lg px-2 py-2 text-left text-sm" [class.bg-gray-900]="activeSectionId === item.section.id" [class.text-white]="activeSectionId === item.section.id" [class.text-gray-600]="activeSectionId !== item.section.id">
+              {{ item.number }} {{ item.section.title }}
+            </button>
+            <button type="button" (click)="addSection(item.section.id)" class="hidden rounded px-1 text-gray-500 group-hover:block" title="Add subsection">+</button>
+            <button type="button" (click)="removeSection(item.section.id)" class="hidden rounded px-1 text-red-500 group-hover:block" title="Delete">×</button>
+          </div>
         }
       </div>
     </aside>
+
     <main class="space-y-6">
       <section class="rounded-2xl border border-gray-200 bg-white p-6">
-        <label class="text-xs font-semibold uppercase tracking-wider text-gray-400">Title</label
-        ><input
-          [(ngModel)]="note.title"
-          placeholder="Enter note title..."
-          class="mt-2 w-full border-0 p-0 text-3xl font-bold text-gray-900 outline-none"
-        /><label class="mt-6 block text-xs font-semibold uppercase tracking-wider text-gray-400"
-          >Description</label
-        ><textarea
-          [(ngModel)]="note.description"
-          rows="3"
-          placeholder="Describe what this note covers..."
-          class="mt-2 w-full resize-none rounded-xl border border-gray-200 p-3 text-sm outline-none"
-        ></textarea>
-        <div class="mt-5 flex flex-wrap gap-2">
-          @for (tag of note.tags; track tag) {
-            <span class="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">#{{ tag }}</span>
-          }
-        </div>
+        <label class="text-xs font-semibold uppercase tracking-wider text-gray-400">Title</label>
+        <input [(ngModel)]="note.title" maxlength="200" placeholder="Enter note title..." class="mt-2 w-full border-0 p-0 text-3xl font-bold text-gray-900 outline-none" />
+        <label class="mt-6 block text-xs font-semibold uppercase tracking-wider text-gray-400">Description</label>
+        <textarea [(ngModel)]="description" rows="3" placeholder="Short description (not stored by the current API)" class="mt-2 w-full resize-none rounded-xl border border-gray-200 p-3 text-sm outline-none"></textarea>
       </section>
-      <section class="rounded-2xl border border-gray-200 bg-white p-6">
-        <div class="mb-5 flex items-center justify-between">
-          <div>
-            <h2 class="font-semibold">Section content</h2>
-            <p class="text-xs text-gray-500">Build your note using reusable content blocks.</p>
+
+      @if (activeSection; as section) {
+        <section class="rounded-2xl border border-gray-200 bg-white p-6">
+          <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-gray-400">Active section</p>
+              <input [ngModel]="section.title" (ngModelChange)="renameSection(section.id, $event)" class="mt-1 text-xl font-semibold text-gray-900 outline-none" />
+            </div>
+            <div class="flex gap-1">
+              <button type="button" (click)="moveSection(section.id, -1)" class="rounded-lg border border-gray-200 px-2 py-1 text-xs">↑</button>
+              <button type="button" (click)="moveSection(section.id, 1)" class="rounded-lg border border-gray-200 px-2 py-1 text-xs">↓</button>
+              <button type="button" (click)="addSection(section.id)" class="rounded-lg border border-gray-200 px-2 py-1 text-xs">+ Subsection</button>
+            </div>
           </div>
-          <span class="text-xs text-gray-400">Section {{ activeSection }}</span>
-        </div>
-        <app-content-block />
-      </section>
+          <app-content-block [blocks]="section.contents" (blocksChange)="setContentBlocks(section.id, $event)" />
+        </section>
+      } @else {
+        <section class="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
+          <p class="font-medium text-gray-700">Create your first section</p>
+          <button type="button" (click)="addSection()" class="mt-3 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white">+ Add Section</button>
+        </section>
+      }
     </main>
+
     <aside class="space-y-5">
       <section class="rounded-2xl border border-gray-200 bg-white p-5">
         <h2 class="font-semibold">Publishing</h2>
-        <label class="mt-4 block text-xs font-medium text-gray-600"
-          >Visibility<select
-            [(ngModel)]="note.visibility"
-            class="mt-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-          >
-            <option value="private">Private</option>
-            <option value="shared">Shared</option>
-            <option value="public">Public</option>
-          </select></label
-        >
+        <label class="mt-4 block text-xs font-medium text-gray-600">Visibility
+          <select [(ngModel)]="note.visibility" class="mt-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+            <option [ngValue]="1">Public</option>
+            <option [ngValue]="2">Shared</option>
+            <option [ngValue]="3">Private</option>
+          </select>
+        </label>
       </section>
       <section class="rounded-2xl border border-gray-200 bg-white p-5">
         <h2 class="font-semibold">Tips</h2>
         <ul class="mt-3 space-y-2 text-xs leading-5 text-gray-500">
-          <li>• Use short sections.</li>
-          <li>• Add examples to difficult concepts.</li>
-          <li>• Use code blocks for snippets.</li>
-          <li>• Publish when the note is ready.</li>
+          <li>• Use short sections.</li><li>• Add examples to difficult concepts.</li><li>• Use code blocks for snippets.</li><li>• Nest subsections when needed.</li>
         </ul>
       </section>
     </aside>

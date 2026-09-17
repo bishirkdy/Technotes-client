@@ -1,49 +1,15 @@
-<div class="min-h-screen bg-white">
-  <header class="sticky top-0 z-30 border-b border-gray-200 bg-white">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-      <a routerLink="/" class="text-xl font-bold text-gray-900">TechNotes</a>
-      <nav class="hidden items-center gap-6 text-sm text-gray-600 md:flex">
-        <a routerLink="/learn" class="font-semibold text-gray-900">Learn</a
-        ><a routerLink="/notes">Notes</a><a routerLink="/login">Sign in</a>
-      </nav>
-    </div>
-  </header>
-  <section class="border-b border-gray-200 bg-gray-50">
-    <div class="mx-auto max-w-7xl px-6 py-16">
-      <p class="text-sm font-semibold text-gray-500">TECHNOTES LEARNING</p>
-      <h1 class="mt-3 max-w-3xl text-5xl font-bold tracking-tight text-gray-900">
-        Learn software development, one topic at a time.
-      </h1>
-      <p class="mt-5 max-w-2xl text-lg leading-8 text-gray-500">
-        Structured lessons inspired by the simplicity of developer learning sites, powered by your
-        TechNotes content model.
-      </p>
-    </div>
-  </section>
-  <main class="mx-auto max-w-7xl px-6 py-12">
-    <div class="mb-7 flex items-end justify-between">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-900">Browse tutorials</h2>
-        <p class="mt-1 text-sm text-gray-500">Choose a technology to start learning.</p>
-      </div>
-    </div>
-    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-      @for (topic of data.learning; track topic.slug) {
-        <a
-          [routerLink]="['/learn', topic.slug]"
-          class="rounded-2xl border border-gray-200 p-6 hover:shadow-sm"
-          ><div
-            class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-900 font-bold text-white"
-          >
-            {{ topic.title[0] }}
-          </div>
-          <h3 class="mt-5 text-xl font-semibold text-gray-900">{{ topic.title }}</h3>
-          <p class="mt-2 text-sm leading-6 text-gray-500">{{ topic.description }}</p>
-          <div class="mt-5 flex justify-between text-xs text-gray-400">
-            <span>{{ topic.lessons.length }} lessons</span><span>Start learning →</span>
-          </div></a
-        >
-      }
-    </div>
-  </main>
+<div class="p-6">
+  <h2 class="text-xl font-bold text-gray-900">Learning Path</h2>
+  <ul class="mt-4 space-y-2">
+    @for (lesson of lessons; track lesson.slug) {
+      <li>
+        <a routerLink="/learn/{{ lesson.slug }}" class="text-blue-600 hover underline">
+          {{ lesson.topic }}
+        </a> - {{ lesson.description }}
+      </li>
+    }
+    @if (lessons.length === 0) {
+      <li class="text-gray-400">No lessons available</li>
+    }
+  </ul>
 </div>

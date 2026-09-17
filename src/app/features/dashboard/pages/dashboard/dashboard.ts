@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DummyDataService } from '../../../../core/data/dummy-data.service';
+import { NoteApiService } from '../../../../features/notes/services/note-api.service';
+import { NoteResponse } from '../../../../features/notes/models/note-response.model';
 
 @Component({ selector:'app-dashboard', imports:[RouterLink], templateUrl:'./dashboard.html', styleUrl:'./dashboard.css' })
 export class Dashboard {
-  constructor(public data: DummyDataService) {}
-  get published() { return this.data.notes.filter(n => n.status === 'Published').length; }
-  get favorites() { return this.data.notes.filter(n => n.favorite).length; }
-  barWidth(count: number): number { return Math.min(count * 2, 100); }
+  private readonly api=inject(NoteApiService);
+  notes:NoteResponse[]=[]; loading=true; error='';
+  ngOnInit(){this.api.getMyNotes().subscribe({next:n=>{this.notes=n;this.loading=false;},error:e=>{this.error=e?.error?.detail||'Unable to load dashboard.';this.loading=false;}});}
+  get published(){return this.notes.filter(n=>n.status===2).length;}
+  get drafts(){return this.notes.filter(n=>n.status!==2).length;}
 }

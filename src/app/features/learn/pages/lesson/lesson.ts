@@ -1,4 +1,65 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DummyDataService } from '../../../../core/data/dummy-data.service';
-@Component({selector:'app-lesson',imports:[RouterLink],templateUrl:'./lesson.html',styleUrl:'./lesson.css'}) export class Lesson { topic:any; lesson:any; index=0; constructor(route:ActivatedRoute,public data:DummyDataService){const topicSlug=route.snapshot.paramMap.get('topic')||'csharp';const lessonSlug=route.snapshot.paramMap.get('lesson')||'introduction';const result=data.getLesson(topicSlug,lessonSlug)||data.getLesson('csharp','introduction')!;this.topic=result!.topic;this.lesson=result!.lesson;this.index=this.topic.lessons.findIndex((l:any)=>l.slug===this.lesson.slug);} get previous(){return this.index>0?this.topic.lessons[this.index-1]:null;} get next(){return this.index<this.topic.lessons.length-1?this.topic.lessons[this.index+1]:null;} }
+
+@Component({
+  selector: 'app-lesson',
+  imports: [RouterLink],
+  templateUrl: './lesson.html',
+  styleUrl: './lesson.css',
+})
+export class Lesson {
+  topic: any;
+  lesson: any;
+  index = 0;
+  lessons: any[] = [];
+
+  constructor(
+    private route: ActivatedRoute
+  ) {
+    const topicSlug = route.snapshot.paramMap.get('topic') || 'csharp';
+    const lessonSlug = route.snapshot.paramMap.get('lesson') || 'introduction';
+
+    const topics = this.getTopics() as Record<string, any>;
+    this.lessons = topics[topicSlug] || [];
+    this.topic = this.lessons.find((l: any) => l.slug === lessonSlug) || this.lessons[0];
+    this.index = this.topic ? this.lessons.findIndex((l: any) => l.slug === this.topic.slug) : 0;
+  }
+
+  get previous() {
+    return this.index > 0 ? this.lessons[this.index - 1] : null;
+  }
+
+  get next() {
+    return this.index < this.lessons.length - 1 ? this.lessons[this.index + 1] : null;
+  }
+
+  getTopics() {
+    return {
+      csharp: {
+        topic: 'C# Basics',
+        slug: 'csharp',
+        lessons: [
+          { slug: 'introduction', title: 'Introduction' },
+          { slug: 'variables', title: 'Variables' },
+          { slug: 'data-types', title: 'Data Types' },
+        ],
+      },
+      angular: {
+        topic: 'Angular',
+        slug: 'angular',
+        lessons: [
+          { slug: 'introduction', title: 'Introduction' },
+          { slug: 'components', title: 'Components' },
+        ],
+      },
+      dotnet: {
+        topic: '.NET',
+        slug: 'dotnet',
+        lessons: [
+          { slug: 'introduction', title: 'Introduction' },
+          { slug: 'webpack', title: 'Webpack configuration' },
+        ],
+      },
+    };
+  }
+}

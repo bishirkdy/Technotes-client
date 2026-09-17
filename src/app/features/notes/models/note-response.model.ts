@@ -1,5 +1,3 @@
-import { ContentBlockModel } from './content-block.model';
-
 export interface NoteResponse {
   id: string;
   title: string;
@@ -16,5 +14,14 @@ export interface NoteSectionResponse {
   title: string;
   sortOrder: number;
   children: NoteSectionResponse[];
-  contents: ContentBlockModel[];
+  contents: NoteContentResponse[];
+}
+
+export interface NoteContentResponse {
+  id: string;
+  type: number | string;
+  sortOrder: number;
+  content: string | null;
+  data: string | null;
+  metadata: string | null;
 }

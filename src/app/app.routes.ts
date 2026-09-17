@@ -19,6 +19,8 @@ import { Topic } from './features/learn/pages/topic/topic';
 import { Lesson } from './features/learn/pages/lesson/lesson';
 import { Search } from './features/search/pages/search/search';
 import { Activity } from './features/activity/pages/activity/activity';
+import { NoteEdit } from './features/notes/pages/note-edit/note-edit';
+import { authGuard } from './features/auth/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -35,11 +37,13 @@ export const routes: Routes = [
   {
     path: 'app',
     component: AppLayout,
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
       { path: 'notes', component: MyNotes },
       { path: 'notes/create', component: NoteCreate },
+      { path: 'notes/edit/:id', component: NoteEdit },
       { path: 'favorites', component: FavoriteList },
       { path: 'shared', component: SharedNotes },
       { path: 'categories', component: CategoryList },

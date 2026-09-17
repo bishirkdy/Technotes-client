@@ -1,4 +1,4 @@
-import { ContentBlockModel } from './content-block.model';
+import { ContentBlockType } from './content-block-type.model';
 
 export interface NoteCreateModel {
   title: string;
@@ -9,8 +9,31 @@ export interface NoteCreateModel {
 }
 
 export interface NoteSectionModel {
+  id: number;
   title: string;
   sortOrder: number;
   children: NoteSectionModel[];
-  contents: ContentBlockModel[];
+  contents: EditorContentModel[];
+}
+
+export interface EditorContentModel {
+  id: number;
+  type: ContentBlockType;
+  sortOrder: number;
+  data: any;
+}
+
+export interface NoteContentRequestModel {
+  type: number;
+  sortOrder: number;
+  content: string | null;
+  data: string | null;
+  metadata: string | null;
+}
+
+export interface NoteSectionRequestModel {
+  title: string;
+  sortOrder: number;
+  children: NoteSectionRequestModel[];
+  contents: NoteContentRequestModel[];
 }

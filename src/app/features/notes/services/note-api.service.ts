@@ -1,84 +1,43 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
 import { environment } from '../../../../environments/environment';
-
 import { NoteCreateModel } from '../models/note-create.model';
 import { NoteResponse } from '../models/note-response.model';
+import { NoteMapperService } from './note-mapper.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class NoteApiService {
-
   private readonly http = inject(HttpClient);
-
+  private readonly mapper = inject(NoteMapperService);
   private readonly baseUrl = `${environment.apiUrl}/notes`;
 
-
-  // Get all public notes
   getPublicNotes(): Observable<NoteResponse[]> {
     return this.http.get<NoteResponse[]>(this.baseUrl);
   }
 
-
-  // Get one note by ID
   getById(id: string): Observable<NoteResponse> {
-
-    return this.http.get<NoteResponse>(
-      `${this.baseUrl}/${id}`
-    );
+    return this.http.get<NoteResponse>(`${this.baseUrl}/${id}`);
   }
 
-
-  // Get current user's notes
   getMyNotes(): Observable<NoteResponse[]> {
-
-    return this.http.get<NoteResponse[]>(
-      `${this.baseUrl}/my`
-    );
+    return this.http.get<NoteResponse[]>(`${this.baseUrl}/my`, { withCredentials: true });
   }
 
-
-  // Create a new note
-  create(
-    request: NoteCreateModel
-  ): Observable<NoteResponse> {
-
-    return this.http.post<NoteResponse>(
-      this.baseUrl,
-      request
-    );
+  create(note: NoteCreateModel): Observable<NoteResponse> {
+    return this.http.post<NoteResponse>(this.baseUrl, this.mapper.toCreateRequest(note), { withCredentials: true });
   }
 
-
-  // Update an existing note
-  update(
-    id: string,
-    request: NoteCreateModel
-  ): Observable<NoteResponse> {
-
-    return this.http.put<NoteResponse>(
-      `${this.baseUrl}/${id}`,
-      request
-    );
+  update(id: string, note: NoteCreateModel): Observable<NoteResponse> {
+    return this.http.put<NoteResponse>(`${this.baseUrl}/${id}`, this.mapper.toCreateRequest(note), { withCredentials: true });
   }
 
-
-  // Delete a note
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, { withCredentials: true });
   }
 
-
-  // Search current user's notes
   search(searchTerm: string): Observable<NoteResponse[]> {
-    return this.http.get<NoteResponse[]>(
-      `${this.baseUrl}/search`,
-      {
-        params: {searchTerm}
-      }
-    );
+    const params = new HttpParams().set('searchTerm', searchTerm.trim());
+    return this.http.get<NoteResponse[]>(`${this.baseUrl}/search`, { params, withCredentials: true });
   }
 }
