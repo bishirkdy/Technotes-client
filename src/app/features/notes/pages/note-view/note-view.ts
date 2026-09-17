@@ -13,7 +13,7 @@ import { FavoriteService } from '../../../favorites/services/favorite.service';
 
 @Component({
   selector: 'app-note-view',
-  imports: [RouterLink, JsonPipe, Navbar],
+  imports: [RouterLink, Navbar],
   templateUrl: './note-view.html',
   styleUrl: './note-view.css',
 })
