@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-category-list',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './category-list.html',
-  styleUrl: './category-list.css',
+  styleUrl: './category-list.css'
 })
-export class CategoryList {
-  categories = ['All', 'TypeScript', 'Angular', 'NET', 'Databases'];
-}
+export class CategoryList {}

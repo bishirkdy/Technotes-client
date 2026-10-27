@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FeaturedNotes } from './featured-notes';
+import { testProviders } from '../../../../testing/test-providers';
 
 describe('FeaturedNotes', () => {
   let component: FeaturedNotes;
@@ -9,6 +10,7 @@ describe('FeaturedNotes', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [FeaturedNotes],
+      providers: testProviders
     }).compileComponents();
 
     fixture = TestBed.createComponent(FeaturedNotes);

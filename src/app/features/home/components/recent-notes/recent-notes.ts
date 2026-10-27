@@ -1,7 +1,35 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NoteApiService } from '../../../notes/services/note-api.service';
 import { NoteResponse } from '../../../notes/models/note-response.model';
+import { noteTextPreview } from '../../../notes/models/note-response.helpers';
+import { NoteApiService } from '../../../notes/services/note-api.service';
 
-@Component({selector:'app-recent-notes',imports:[RouterLink],templateUrl:'./recent-notes.html',styleUrl:'./recent-notes.css'})
-export class RecentNotes {private readonly api=inject(NoteApiService);notes:NoteResponse[]=[];ngOnInit(){this.api.getPublicNotes().subscribe({next:n=>this.notes=n.slice(0,5),error:()=>this.notes=[]});}preview(n:NoteResponse){for(const s of n.sections??[]){for(const c of s.contents??[]){if(c.content)return c.content;}}return 'Recently published note.';}}
+@Component({
+  selector: 'app-recent-notes',
+  imports: [RouterLink],
+  templateUrl: './recent-notes.html',
+  styleUrl: './recent-notes.css'
+})
+export class RecentNotes {
+  private readonly api = inject(NoteApiService);
+
+  notes: NoteResponse[] = [];
+  loading = true;
+
+  ngOnInit(): void {
+    this.api.getPublicNotes().subscribe({
+      next: notes => {
+        this.notes = notes.slice(0, 5);
+        this.loading = false;
+      },
+      error: () => {
+        this.notes = [];
+        this.loading = false;
+      }
+    });
+  }
+
+  preview(note: NoteResponse): string {
+    return noteTextPreview(note) || 'Recently published note.';
+  }
+}

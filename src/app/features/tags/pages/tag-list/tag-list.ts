@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-tag-list',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './tag-list.html',
-  styleUrl: './tag-list.css',
+  styleUrl: './tag-list.css'
 })
-export class TagList {
-  tags = ['csharp', 'angular', 'dotnet', 'javascript', 'sql', 'python'];
-}
+export class TagList {}
