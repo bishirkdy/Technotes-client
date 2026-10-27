@@ -1,31 +1,53 @@
 import { inject } from '@angular/core';
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { AuthService } from './auth.service';
 
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
-  const isAuthEndpoint = req.url.includes('/api/v1/auth/');
-  const isRefresh = req.url.endsWith('/auth/refresh');
+  const router = inject(Router);
+  const authBase = `${environment.apiUrl}/auth`;
+  const isAuthEndpoint = req.url.startsWith(authBase);
+  const isRefresh = req.url === `${authBase}/refresh`;
+  const token = auth.accessToken;
 
-  const authenticatedRequest = !isAuthEndpoint && !!auth.accessToken;
-  const request = authenticatedRequest
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${auth.accessToken}` }, withCredentials: true })
+  const request = !isAuthEndpoint && token
+    ? req.clone({
+        setHeaders: { Authorization: `Bearer ${token}` },
+        withCredentials: true
+      })
     : req;
 
   return next(request).pipe(
     catchError((error: unknown) => {
-      if (!(error instanceof HttpErrorResponse) || error.status !== 401 || isAuthEndpoint || isRefresh || !auth.accessToken) {
+      if (!(error instanceof HttpErrorResponse) || error.status !== 401 || isAuthEndpoint || isRefresh || !token) {
         return throwError(() => error);
       }
 
       return auth.refreshToken().pipe(
         switchMap(response => {
-          if (!response.accessToken) return throwError(() => error);
-          return next(req.clone({ setHeaders: { Authorization: `Bearer ${response.accessToken}` }, withCredentials: true }));
+          if (!response.accessToken) {
+            return throwError(() => error);
+          }
+
+          return next(
+            req.clone({
+              setHeaders: { Authorization: `Bearer ${response.accessToken}` },
+              withCredentials: true
+            })
+          );
         }),
         catchError(refreshError => {
           auth.clearAuth();
+
+          if (!router.url.startsWith('/login')) {
+            void router.navigate(['/login'], {
+              queryParams: { returnUrl: router.url }
+            });
+          }
+
           return throwError(() => refreshError);
         })
       );

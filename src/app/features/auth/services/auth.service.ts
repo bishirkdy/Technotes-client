@@ -1,23 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, finalize, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-
-export interface AuthResponse {
-  accessToken: string | null;
-  accessTokenExpiresAtUtc: string;
-  userId: string;
-  userName: string | null;
-  email: string | null;
-  roles: string[] | null;
-}
-
-export interface MeResponse {
-  userId: string | null;
-  userName: string | null;
-  email: string | null;
-  roles: string[];
-}
+import { AuthResponse } from '../models/auth-response.model';
+import { LoginRequest } from '../models/login-request.model';
+import { MeResponse } from '../models/me-response.model';
+import { RegisterRequest } from '../models/register-request.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -28,6 +16,7 @@ export class AuthService {
 
   private _accessToken = this.readToken();
   private _user = this.readUser();
+  private refreshRequest$: Observable<AuthResponse> | null = null;
 
   get accessToken(): string {
     return this._accessToken;
@@ -42,21 +31,36 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }, { withCredentials: true }).pipe(
-      tap(response => this.storeAuth(response))
-    );
+    const request: LoginRequest = { email, password };
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/login`, request, { withCredentials: true })
+      .pipe(tap(response => this.storeAuth(response)));
   }
 
   register(userName: string, email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { userName, email, password }, { withCredentials: true }).pipe(
-      tap(response => this.storeAuth(response))
-    );
+    const request: RegisterRequest = { userName, email, password };
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/register`, request, { withCredentials: true })
+      .pipe(tap(response => this.storeAuth(response)));
   }
 
+  // The backend rotates the refresh token, so parallel 401s must share one request.
   refreshToken(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, {}, { withCredentials: true }).pipe(
-      tap(response => this.storeAuth(response))
-    );
+    if (this.refreshRequest$) {
+      return this.refreshRequest$;
+    }
+
+    this.refreshRequest$ = this.http
+      .post<AuthResponse>(`${this.apiUrl}/refresh`, {}, { withCredentials: true })
+      .pipe(
+        tap(response => this.storeAuth(response)),
+        finalize(() => {
+          this.refreshRequest$ = null;
+        }),
+        shareReplay(1)
+      );
+
+    return this.refreshRequest$;
   }
 
   getMe(): Observable<MeResponse> {
@@ -70,13 +74,15 @@ export class AuthService {
 
   logout(): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/logout`, {}, { withCredentials: true }).pipe(
-      tap(() => this.clearAuth())
+      finalize(() => this.clearAuth())
     );
   }
 
   clearAuth(): void {
     this._accessToken = '';
     this._user = null;
+    this.refreshRequest$ = null;
+
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem(this.tokenKey);
       localStorage.removeItem(this.userKey);
@@ -91,6 +97,7 @@ export class AuthService {
       email: response.email,
       roles: response.roles ?? []
     };
+
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(this.tokenKey, this._accessToken);
       localStorage.setItem(this.userKey, JSON.stringify(this._user));
@@ -102,13 +109,26 @@ export class AuthService {
   }
 
   private readUser(): MeResponse | null {
-    if (typeof localStorage === 'undefined') return null;
+    if (typeof localStorage === 'undefined') {
+      return null;
+    }
+
     const value = localStorage.getItem(this.userKey);
-    if (!value) return null;
-    try { return JSON.parse(value) as MeResponse; } catch { return null; }
+    if (!value) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(value) as MeResponse;
+    } catch {
+      localStorage.removeItem(this.userKey);
+      return null;
+    }
   }
 
   private persistUser(user: MeResponse): void {
-    if (typeof localStorage !== 'undefined') localStorage.setItem(this.userKey, JSON.stringify(user));
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(this.userKey, JSON.stringify(user));
+    }
   }
 }
