@@ -13,7 +13,7 @@
   </div>
 
   @if (saved) { <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">Note created successfully.</div> }
-  @if (error) { <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }</div> }
+  @if (error) { <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ error }}</div> }
 
   <div class="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)_260px]">
     <aside class="rounded-2xl border border-gray-200 bg-white p-4">
@@ -39,8 +39,6 @@
       <section class="rounded-2xl border border-gray-200 bg-white p-6">
         <label class="text-xs font-semibold uppercase tracking-wider text-gray-400">Title</label>
         <input [(ngModel)]="note.title" maxlength="200" placeholder="Enter note title..." class="mt-2 w-full border-0 p-0 text-3xl font-bold text-gray-900 outline-none" />
-        <label class="mt-6 block text-xs font-semibold uppercase tracking-wider text-gray-400">Description</label>
-        <textarea [(ngModel)]="description" rows="3" placeholder="Short description (not stored by the current API)" class="mt-2 w-full resize-none rounded-xl border border-gray-200 p-3 text-sm outline-none"></textarea>
       </section>
 
       @if (activeSection; as section) {
@@ -71,9 +69,16 @@
         <h2 class="font-semibold">Publishing</h2>
         <label class="mt-4 block text-xs font-medium text-gray-600">Visibility
           <select [(ngModel)]="note.visibility" class="mt-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
-            <option [ngValue]="1">Public</option>
+            <option [ngValue]="1">Private</option>
             <option [ngValue]="2">Shared</option>
-            <option [ngValue]="3">Private</option>
+            <option [ngValue]="3">Public</option>
+          </select>
+        </label>
+        <label class="mt-4 block text-xs font-medium text-gray-600">Status
+          <select [(ngModel)]="note.status" class="mt-2 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+            @for (status of statuses; track status.value) {
+              <option [ngValue]="status.value">{{ status.label }}</option>
+            }
           </select>
         </label>
       </section>

@@ -1,79 +1,78 @@
 import { Component, inject } from '@angular/core';
-import { NoteApiService } from '../../services/note-api.service';
-import { NoteResponse } from '../../models/note-response.model';
 import { RouterLink } from '@angular/router';
+import { NoteCard } from '../../components/note-card/note-card';
+import { NoteResponse } from '../../models/note-response.model';
+import { NoteStatus } from '../../models/note-status.model';
+import { NoteVisibility } from '../../models/note-visibility.model';
+import { NoteApiService } from '../../services/note-api.service';
 
 @Component({
   selector: 'app-my-notes',
-  imports: [RouterLink],
+  imports: [RouterLink, NoteCard],
   templateUrl: './my-notes.html',
-  styleUrl: './my-notes.css',
+  styleUrl: './my-notes.css'
 })
 export class MyNotes {
   private readonly api = inject(NoteApiService);
+
+  readonly filters = ['All', 'Published', 'Draft', 'Public', 'Shared', 'Private'];
+
   filter = 'All';
   notes: NoteResponse[] = [];
   loading = true;
   error = '';
   deletingId = '';
-  ngOnInit() {
+
+  ngOnInit(): void {
     this.load();
   }
-  load() {
+
+  load(): void {
     this.loading = true;
     this.api.getMyNotes().subscribe({
-      next: (n) => {
-        this.notes = n;
+      next: notes => {
+        this.notes = notes;
         this.loading = false;
       },
-      error: (e) => {
-        this.error = e?.error?.detail || 'Unable to load your notes.';
+      error: err => {
+        this.error = err?.error?.detail || 'Unable to load your notes.';
         this.loading = false;
-      },
+      }
     });
   }
-  get filteredNotes() {
-    return this.notes.filter(
-      (n) =>
-        this.filter === 'All' ||
-        (this.filter === 'Published' && n.status === 2) ||
-        (this.filter === 'Draft' && n.status === 1) ||
-        (this.filter === 'Public' && n.visibility === 1) ||
-        (this.filter === 'Shared' && n.visibility === 2) ||
-        (this.filter === 'Private' && n.visibility === 3),
-    );
+
+  get filteredNotes(): NoteResponse[] {
+    switch (this.filter) {
+      case 'Published':
+        return this.notes.filter(note => note.status === NoteStatus.Published);
+      case 'Draft':
+        return this.notes.filter(note => note.status === NoteStatus.Draft);
+      case 'Public':
+        return this.notes.filter(note => note.visibility === NoteVisibility.Public);
+      case 'Shared':
+        return this.notes.filter(note => note.visibility === NoteVisibility.Shared);
+      case 'Private':
+        return this.notes.filter(note => note.visibility === NoteVisibility.Private);
+      default:
+        return this.notes;
+    }
   }
-  status(v: number) {
-    return v === 2 ? 'Published' : 'Draft';
-  }
-  visibility(v: number) {
-    return v === 1 ? 'Public' : v === 2 ? 'Shared' : 'Private';
-  }
-  preview(n: NoteResponse) {
-    return this.firstText(n.sections) || 'No text preview available.';
-  }
-  delete(id: string) {
-    if (!confirm('Delete this note?')) return;
+
+  delete(id: string): void {
+    if (!confirm('Delete this note?')) {
+      return;
+    }
+
     this.deletingId = id;
     this.api.delete(id).subscribe({
       next: () => {
-        this.notes = this.notes.filter((n) => n.id !== id);
+        this.notes = this.notes.filter(note => note.id !== id);
         this.deletingId = '';
       },
-      error: (e) => {
-        this.error = e?.error?.detail || 'Unable to delete note.';
+      error: err => {
+        this.error = err?.error?.detail || 'Unable to delete note.';
         this.deletingId = '';
-      },
-    });
-  }
-  private firstText(sections: any[]): string {
-    for (const s of sections ?? []) {
-      for (const c of s.contents ?? []) {
-        if (c.content) return c.content;
       }
-      const x = this.firstText(s.children);
-      if (x) return x;
-    }
-    return '';
+    });
   }
 }

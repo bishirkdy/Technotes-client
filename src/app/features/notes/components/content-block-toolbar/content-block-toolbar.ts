@@ -1,14 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-
-export type ContentBlockType =
-  | 'text'
-  | 'definition'
-  | 'points'
-  | 'example'
-  | 'code'
-  | 'table'
-  | 'graph'
-  | 'quote';
+import { ContentBlockType } from '../../models/content-block-type.model';
 
 @Component({
   selector: 'app-content-block-toolbar',

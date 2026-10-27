@@ -1,0 +1,22 @@
+<article class="rounded-2xl border border-gray-200 bg-white p-6">
+  <div class="flex justify-between gap-3">
+    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs">{{ visibilityLabel }}</span>
+    <span class="text-xs text-gray-400">{{ sectionCount }} {{ sectionCount === 1 ? 'section' : 'sections' }}</span>
+  </div>
+
+  <h2 class="mt-5 text-lg font-semibold text-gray-900">{{ note.title }}</h2>
+  <p class="mt-2 line-clamp-3 text-sm leading-6 text-gray-500">{{ preview }}</p>
+
+  <div class="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
+    <a [routerLink]="['/notes', note.id]" class="text-sm font-semibold text-gray-900">Open &rarr;</a>
+
+    @if (editable) {
+      <div class="flex gap-3">
+        <a [routerLink]="['/app/notes/edit', note.id]" class="text-xs text-gray-500">Edit</a>
+        <button (click)="requestDelete()" [disabled]="deleting" class="text-xs text-red-500 disabled:opacity-50">
+          {{ deleting ? 'Deleting...' : 'Delete' }}
+        </button>
+      </div>
+    }
+  </div>
+</article>

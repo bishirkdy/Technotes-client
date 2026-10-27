@@ -2,9 +2,11 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { NoteApiService } from '../../services/note-api.service';
-import { NoteCreateModel, NoteSectionModel } from '../../models/note-create.model';
+import { NoteCreateModel } from '../../models/note-create.model';
+import { NoteSectionModel } from '../../models/note-section.model';
 import { ContentBlockModel } from '../../models/content-block.model';
-import { ContentBlockType } from '../../models/content-block-type.model';
+import { NoteStatus } from '../../models/note-status.model';
+import { NoteVisibility } from '../../models/note-visibility.model';
 import { ContentBlock } from '../../components/content-block/content-block';
 
 @Component({
@@ -17,15 +19,20 @@ export class NoteCreate {
   private readonly noteApi = inject(NoteApiService);
   private readonly router = inject(Router);
 
+  readonly statuses = [
+    { value: NoteStatus.Draft, label: 'Draft' },
+    { value: NoteStatus.Published, label: 'Published' }
+  ];
+
   note: NoteCreateModel = {
     title: '',
-    visibility: 1,
+    visibility: NoteVisibility.Private,
+    status: NoteStatus.Draft,
     folderId: null,
     categoryId: null,
     sections: []
   };
 
-  description = '';
   activeSectionId: number | null = null;
   loading = false;
   saved = false;
@@ -114,8 +121,6 @@ export class NoteCreate {
       return [{ section, level, number }, ...this.flattenSections(section.children, level + 1, number)];
     });
   }
-
-  blockType(type: ContentBlockType): string { return type; }
 
   private findSection(sections: NoteSectionModel[], id: number): NoteSectionModel | null {
     for (const section of sections) {

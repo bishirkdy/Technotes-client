@@ -41,12 +41,14 @@
                         {{ favorites.isFavorite(note.id) ? '★ Saved' : '☆ Save' }}
                     </button>
 
-                    <a
-                        [routerLink]="['/app/notes/edit', note.id]"
-                        class="rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                    >
-                        Edit
-                    </a>
+                    @if (canEdit) {
+                        <a
+                            [routerLink]="['/app/notes/edit', note.id]"
+                            class="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                        >
+                            Edit
+                        </a>
+                    }
 
                 </div>
 

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NoteList } from './note-list';
+import { testProviders } from '../../../../testing/test-providers';
 
 describe('NoteList', () => {
   let component: NoteList;
@@ -9,6 +10,7 @@ describe('NoteList', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [NoteList],
+      providers: testProviders
     }).compileComponents();
 
     fixture = TestBed.createComponent(NoteList);

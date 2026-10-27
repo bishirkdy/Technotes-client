@@ -1,3 +1,5 @@
+import { NoteSectionResponse } from './note-section-response.model';
+
 export interface NoteResponse {
   id: string;
   title: string;
@@ -7,21 +9,4 @@ export interface NoteResponse {
   folderId: string | null;
   categoryId: string | null;
   sections: NoteSectionResponse[];
-}
-
-export interface NoteSectionResponse {
-  id: string;
-  title: string;
-  sortOrder: number;
-  children: NoteSectionResponse[];
-  contents: NoteContentResponse[];
-}
-
-export interface NoteContentResponse {
-  id: string;
-  type: number | string;
-  sortOrder: number;
-  content: string | null;
-  data: string | null;
-  metadata: string | null;
 }
