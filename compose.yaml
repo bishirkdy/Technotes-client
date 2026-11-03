@@ -1,0 +1,27 @@
+name: technotes-frontend
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: technotes-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    environment:
+      API_UPSTREAM: ${API_UPSTREAM:-http://host.docker.internal:8081}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    develop:
+      watch:
+        - action: rebuild
+          path: ./src
+        - action: rebuild
+          path: ./package.json
+        - action: rebuild
+          path: ./package-lock.json
+        - action: rebuild
+          path: ./Dockerfile
+        - action: rebuild
+          path: ./nginx.conf
