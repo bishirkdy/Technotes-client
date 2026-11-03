@@ -1,34 +1,60 @@
 <div class="space-y-6">
-  <div>
-    <h1 class="text-3xl font-bold text-gray-900">Favorites</h1>
-    <p class="mt-1 text-sm text-gray-500">
-      Notes you saved for quick access. Favorites are stored locally because the current API has no
-      favorites endpoint.
-    </p>
-  </div>
+  <app-page-header
+    eyebrow="Saved"
+    title="Favorites"
+    description="Documentation you saved for quick access. Favorites are stored in this browser."
+  >
+    <a routerLink="/notes" class="btn-ghost text-xs">Browse documentation</a>
+  </app-page-header>
 
   @if (loading) {
-    <p class="text-gray-500">Loading favorites...</p>
-  } @else if (error) {
-    <p class="text-red-600">{{ error }}</p>
-  } @else if (notes.length) {
     <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-      @for (note of notes; track note.id) {
-        <article class="rounded-2xl border border-gray-200 bg-white p-5">
-          <div class="flex justify-between">
-            <span class="text-xs text-gray-500">{{ note.sections.length }} sections</span>
-            <button (click)="remove(note.id)" class="text-lg" title="Remove from favorites">&#9733;</button>
-          </div>
-          <h2 class="mt-4 font-semibold text-gray-900">{{ note.title }}</h2>
-          <a [routerLink]="['/notes', note.id]" class="mt-5 inline-block text-sm font-semibold">Read note &rarr;</a>
-        </article>
+      @for (item of [1, 2, 3]; track item) {
+        <div class="skeleton h-56 rounded-3xl"></div>
       }
     </div>
+  } @else if (error) {
+    <app-empty-state title="Could not load favorites" [message]="error">
+      <button type="button" class="btn-ghost text-xs" (click)="load()">Try again</button>
+    </app-empty-state>
+  } @else if (notes.length === 0) {
+    <app-empty-state
+      title="No favorites yet"
+      message="Save a guide from its reading page and it will appear here."
+    >
+      <a routerLink="/notes" class="btn-primary text-xs">Browse documentation</a>
+    </app-empty-state>
   } @else {
-    <div class="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
-      <p class="font-medium text-gray-700">No favorites yet</p>
-      <p class="mt-1 text-sm text-gray-400">Save notes from the note view.</p>
-      <a routerLink="/notes" class="mt-5 inline-block text-sm font-semibold text-gray-900">Explore notes &rarr;</a>
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      @for (note of notes; track note.id) {
+        <article class="glass-card glass-card-hover group flex flex-col p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex flex-wrap gap-1.5">
+              <span class="badge">{{ note.categoryName || 'Documentation' }}</span>
+              <span class="badge-neutral">{{ sectionCount(note) }} sections</span>
+            </div>
+            <button
+              type="button"
+              (click)="remove(note.id)"
+              class="text-lg leading-none text-acid-300 transition hover:scale-110"
+              title="Remove from favorites"
+              aria-label="Remove from favorites"
+            >
+              ★
+            </button>
+          </div>
+
+          <h2 class="mt-5 text-xl font-semibold tracking-[-0.03em] text-mist-50">
+            <a [routerLink]="['/notes', note.id]" class="transition group-hover:text-acid-300">{{ note.title }}</a>
+          </h2>
+          <p class="mt-3 line-clamp-3 flex-1 text-sm leading-7 text-mist-300">{{ preview(note) }}</p>
+
+          <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4 text-xs text-mist-500">
+            <span>{{ date(note) | date: 'MMM d, y' }}</span>
+            <a [routerLink]="['/notes', note.id]" class="font-semibold text-acid-300">Read guide →</a>
+          </div>
+        </article>
+      }
     </div>
   }
 </div>

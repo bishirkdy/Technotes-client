@@ -1,1 +1,65 @@
-<section class="bg-white"><div class="mx-auto max-w-7xl px-6 py-20"><div class="flex items-end justify-between"><div><p class="text-sm font-medium text-gray-500">FEATURED</p><h2 class="mt-2 text-2xl font-semibold tracking-tight text-gray-900">Featured notes</h2><p class="mt-2 text-gray-600">Explore useful knowledge from the community.</p></div><a routerLink="/notes" class="hidden text-sm font-medium text-gray-700 sm:block">View all →</a></div>@if(loading){<p class="mt-10 text-gray-500">Loading...</p>}@else if(notes.length===0){<p class="mt-10 text-gray-500">No public notes yet.</p>}@else{<div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">@for(note of notes;track note.id){<article class="rounded-xl border border-gray-200 p-6 transition hover:border-gray-400"><div class="flex items-center justify-between"><span class="text-xs font-medium text-gray-500">Public</span><span class="text-xs text-gray-400">{{note.sections.length}} sections</span></div><h3 class="mt-4 text-lg font-semibold text-gray-900">{{note.title}}</h3><p class="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">{{preview(note)}}</p><div class="mt-6 flex justify-end"><a [routerLink]="['/notes',note.id]" class="text-sm font-medium text-gray-700">Read →</a></div></article>}</div>}</div></section>
+<section class="py-16 sm:py-20">
+  <div class="page-shell">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="eyebrow">Featured</p>
+        <h2 class="section-title mt-4">Guides worth opening</h2>
+        <p class="mt-3 max-w-2xl text-sm leading-7 text-mist-300">
+          The most recently published documentation.
+        </p>
+      </div>
+      <a routerLink="/notes" class="btn-ghost shrink-0 text-xs">View all docs</a>
+    </div>
+
+    @if (loading) {
+      <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        @for (item of [1, 2, 3]; track item) {
+          <div class="skeleton h-64 rounded-3xl"></div>
+        }
+      </div>
+    } @else if (error) {
+      <p class="mt-8 text-sm text-rose-300">{{ error }}</p>
+    } @else if (notes.length === 0) {
+      <div class="mt-8">
+        <app-empty-state
+          title="No documentation yet"
+          message="Published guides will appear here."
+        >
+          <a routerLink="/notes" class="btn-primary text-xs">Browse documentation</a>
+        </app-empty-state>
+      </div>
+    } @else {
+      <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        @for (note of notes; track note.id; let index = $index) {
+          <article class="glass-card glass-card-hover group flex flex-col p-6">
+            <div class="flex items-center justify-between gap-3">
+              <span class="badge">{{ note.categoryName || 'Documentation' }}</span>
+              <span class="text-[10px] uppercase tracking-[0.18em] text-mist-500">
+                {{ (index + 1).toString().padStart(2, '0') }}
+              </span>
+            </div>
+
+            <h3 class="mt-5 text-2xl font-semibold tracking-[-0.035em] text-mist-50">
+              <a [routerLink]="['/notes', note.id]" class="transition group-hover:text-acid-300">{{ note.title }}</a>
+            </h3>
+
+            <p class="mt-3 line-clamp-3 flex-1 text-sm leading-7 text-mist-300">{{ preview(note) }}</p>
+
+            @if (note.tags?.length) {
+              <div class="mt-5 flex flex-wrap gap-1.5">
+                @for (tag of note.tags!.slice(0, 3); track tag) {
+                  <span class="badge-neutral">#{{ tag }}</span>
+                }
+              </div>
+            }
+
+            <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4 text-xs text-mist-500">
+              <span>{{ sectionCount(note) }} {{ sectionCount(note) === 1 ? 'section' : 'sections' }}</span>
+              <span>{{ date(note) | date: 'MMM d, y' }}</span>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>

@@ -1,1 +1,185 @@
-<div class="space-y-6"><div><p class="text-sm text-gray-400">Workspace</p><h1 class="text-3xl font-bold text-gray-900">Dashboard</h1><p class="mt-1 text-sm text-gray-500">Overview of your notes.</p></div>@if(loading){<p class="text-gray-500">Loading dashboard...</p>}@else if(error){<p class="text-red-600">{{error}}</p>}@else{<div class="grid gap-4 md:grid-cols-3"><div class="rounded-2xl border border-gray-200 bg-white p-5"><p class="text-3xl font-bold">{{notes.length}}</p><p class="mt-1 text-sm text-gray-500">Total notes</p></div><div class="rounded-2xl border border-gray-200 bg-white p-5"><p class="text-3xl font-bold">{{published}}</p><p class="mt-1 text-sm text-gray-500">Published notes</p></div><div class="rounded-2xl border border-gray-200 bg-white p-5"><p class="text-3xl font-bold">{{drafts}}</p><p class="mt-1 text-sm text-gray-500">Drafts</p></div></div><div class="rounded-2xl border border-gray-200 bg-white p-6"><div class="flex items-center justify-between"><h2 class="font-semibold">Recent notes</h2><a routerLink="/app/notes" class="text-sm font-semibold">View all →</a></div>@if(notes.length===0){<p class="mt-6 text-sm text-gray-500">You haven't created any notes yet.</p>}@else{<div class="mt-4 divide-y divide-gray-100">@for(note of notes.slice(0,5);track note.id){<a [routerLink]="['/notes',note.id]" class="flex items-center justify-between gap-4 py-4"><span class="font-medium text-gray-800">{{note.title}}</span><span class="text-xs text-gray-400">{{note.sections.length}} sections</span></a>}</div>}</div>}</div>
+<div class="space-y-6">
+  <app-page-header
+    eyebrow="Workspace"
+    title="Dashboard"
+    [description]="description"
+  >
+    @if (isAdmin) {
+      <a routerLink="/app/notes/create" class="btn-primary text-xs">+ New note</a>
+    } @else {
+      <a routerLink="/notes" class="btn-primary text-xs">Browse notes</a>
+    }
+  </app-page-header>
+
+  @if (loading) {
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <div class="skeleton h-28 rounded-3xl"></div>
+      }
+    </div>
+    <div class="skeleton h-72 rounded-3xl"></div>
+  } @else if (error) {
+    <app-empty-state title="Dashboard unavailable" [message]="error">
+      <button type="button" class="btn-ghost text-xs" (click)="load()">Try again</button>
+    </app-empty-state>
+  } @else {
+    @if (isAdmin) {
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="glass-card p-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-mist-500">Total notes</p>
+          <p class="mt-3 text-4xl font-semibold tracking-[-0.05em] text-mist-50">{{ notes.length }}</p>
+          <p class="mt-1 text-xs text-mist-400">Across your workspace</p>
+        </div>
+        <div class="glass-card p-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-mist-500">Published</p>
+          <p class="mt-3 text-4xl font-semibold tracking-[-0.05em] text-acid-300">{{ published }}</p>
+          <p class="mt-1 text-xs text-mist-400">Ready to read</p>
+        </div>
+        <div class="glass-card p-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-mist-500">Drafts</p>
+          <p class="mt-3 text-4xl font-semibold tracking-[-0.05em] text-mist-50">{{ drafts }}</p>
+          <p class="mt-1 text-xs text-mist-400">Still in progress</p>
+        </div>
+        <div class="glass-card p-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-mist-500">Public</p>
+          <p class="mt-3 text-4xl font-semibold tracking-[-0.05em] text-mist-50">{{ publicNotes }}</p>
+          <p class="mt-1 text-xs text-mist-400">Visible in Explore</p>
+        </div>
+      </div>
+    } @else {
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="glass-card p-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-mist-500">Reading now</p>
+          <p class="mt-3 text-4xl font-semibold tracking-[-0.05em] text-mist-50">{{ reading }}</p>
+          <p class="mt-1 text-xs text-mist-400">Notes left open</p>
+        </div>
+        <div class="glass-card p-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-mist-500">Finished</p>
+          <p class="mt-3 text-4xl font-semibold tracking-[-0.05em] text-acid-300">{{ finished }}</p>
+          <p class="mt-1 text-xs text-mist-400">Read to the end</p>
+        </div>
+        <div class="glass-card p-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-mist-500">In the library</p>
+          <p class="mt-3 text-4xl font-semibold tracking-[-0.05em] text-mist-50">{{ notes.length }}</p>
+          <p class="mt-1 text-xs text-mist-400">Published notes</p>
+        </div>
+        <div class="glass-card p-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-mist-500">Saved</p>
+          <p class="mt-3 text-4xl font-semibold tracking-[-0.05em] text-mist-50">{{ savedCount }}</p>
+          <p class="mt-1 text-xs text-mist-400">On this device</p>
+        </div>
+      </div>
+    }
+
+    <div class="grid gap-5 xl:grid-cols-[1.4fr_0.85fr]">
+      <section class="glass-panel rounded-3xl p-5 sm:p-6">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-semibold text-mist-50">
+              {{ isAdmin ? 'Recent notes' : 'Continue reading' }}
+            </h2>
+            <p class="mt-1 text-xs text-mist-400">
+              {{ isAdmin ? 'Sorted by the latest update.' : 'Sorted by your latest reading session.' }}
+            </p>
+          </div>
+          <a [routerLink]="isAdmin ? '/app/notes' : '/notes'" class="text-xs font-semibold text-acid-300">
+            View all →
+          </a>
+        </div>
+
+        @if (recentNotes.length === 0) {
+          <div class="mt-6">
+            @if (isAdmin) {
+              <app-empty-state
+                title="No notes yet"
+                message="Your most recently updated notes will appear here."
+              >
+                <a routerLink="/app/notes/create" class="btn-primary text-xs">Create your first note</a>
+              </app-empty-state>
+            } @else {
+              <app-empty-state
+                title="Nothing to read yet"
+                message="Published notes will appear here as soon as they are available."
+              >
+                <a routerLink="/notes" class="btn-primary text-xs">Browse the library</a>
+              </app-empty-state>
+            }
+          </div>
+        } @else {
+          <div class="mt-4 divide-y divide-white/10">
+            @for (note of recentNotes; track note.id) {
+              <a
+                [routerLink]="['/notes', note.id]"
+                class="group flex items-center gap-4 py-4"
+              >
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.035] text-xs text-acid-300">
+                  ¶
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-semibold text-mist-100 transition group-hover:text-acid-300">{{ note.title }}</p>
+                  <p class="mt-0.5 text-xs text-mist-500">
+                    {{ note.categoryName || 'Uncategorized' }} · {{ sectionCount(note) }} sections
+                  </p>
+                  @if (!isAdmin) {
+                    <div class="mt-2 flex items-center gap-2">
+                      <div class="h-1 max-w-56 flex-1 overflow-hidden rounded-full bg-white/10">
+                        <div class="h-full rounded-full bg-acid-400" [style.width.%]="progress(note)"></div>
+                      </div>
+                      <span class="text-[10px] tabular-nums text-mist-500">{{ progress(note) }}%</span>
+                    </div>
+                  }
+                </div>
+                @if (date(note)) {
+                  <span class="shrink-0 text-[10px] text-mist-500">{{ date(note) | date: 'MMM d' }}</span>
+                }
+              </a>
+            }
+          </div>
+        }
+      </section>
+
+      <div class="space-y-5">
+        @if (isAdmin) {
+          <section class="glass-panel rounded-3xl p-5 sm:p-6">
+            <h2 class="text-lg font-semibold text-mist-50">By category</h2>
+            <p class="mt-1 text-xs text-mist-400">Derived from your notes.</p>
+
+            @if (categories.length === 0) {
+              <p class="mt-5 text-sm text-mist-400">No categories yet.</p>
+            } @else {
+              <div class="mt-5 space-y-3">
+                @for (category of categories; track category.name) {
+                  <div class="flex items-center gap-3">
+                    <span class="w-28 shrink-0 truncate text-xs text-mist-300">{{ category.name }}</span>
+                    <div class="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                      <div
+                        class="h-full rounded-full bg-acid-400"
+                        [style.width.%]="(category.count / notes.length) * 100"
+                      ></div>
+                    </div>
+                    <span class="w-5 text-right text-xs text-mist-500">{{ category.count }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        <section class="glass-panel rounded-3xl p-5 sm:p-6">
+          <h2 class="text-lg font-semibold text-mist-50">Quick actions</h2>
+          <div class="mt-4 grid gap-2">
+            @if (isAdmin) {
+              <a routerLink="/app/notes/create" class="btn-primary w-full text-xs">Create a note</a>
+              <a routerLink="/notes" class="btn-ghost w-full text-xs">Browse documentation</a>
+              <a routerLink="/app/favorites" class="btn-ghost w-full text-xs">Saved notes</a>
+            } @else {
+              <a routerLink="/notes" class="btn-primary w-full text-xs">Browse the library</a>
+              <a routerLink="/learn" class="btn-ghost w-full text-xs">Open the reading room</a>
+              <a routerLink="/app/favorites" class="btn-ghost w-full text-xs">Saved notes</a>
+            }
+          </div>
+        </section>
+      </div>
+    </div>
+  }
+</div>

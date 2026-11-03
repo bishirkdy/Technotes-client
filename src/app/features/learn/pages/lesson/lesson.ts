@@ -1,65 +1,60 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { catchError, forkJoin, of } from 'rxjs';
+import { Navbar } from '../../../../shared/components/navbar/navbar';
+import { Footer } from '../../../../shared/components/footer/footer';
+import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
+import { DocsSidebar } from '../../../notes/components/docs-sidebar/docs-sidebar';
+import { NoteReader } from '../../../notes/components/note-reader/note-reader';
+import { ReadingProgress } from '../../../notes/components/reading-progress/reading-progress';
+import { NoteResponse } from '../../../notes/models/note-response.model';
+import { noteSectionCount } from '../../../notes/models/note-response.helpers';
+import { NoteApiService } from '../../../notes/services/note-api.service';
 
 @Component({
   selector: 'app-lesson',
-  imports: [RouterLink],
+  imports: [RouterLink, Navbar, Footer, EmptyState, NoteReader, ReadingProgress, DatePipe, DocsSidebar],
   templateUrl: './lesson.html',
   styleUrl: './lesson.css',
 })
 export class Lesson {
-  topic: any;
-  lesson: any;
-  index = 0;
-  lessons: any[] = [];
+  private readonly route = inject(ActivatedRoute);
+  private readonly api = inject(NoteApiService);
 
-  constructor(
-    private route: ActivatedRoute
-  ) {
-    const topicSlug = route.snapshot.paramMap.get('topic') || 'csharp';
-    const lessonSlug = route.snapshot.paramMap.get('lesson') || 'introduction';
+  topic = '';
+  note: NoteResponse | null = null;
+  docsNotes: NoteResponse[] = [];
+  loading = true;
+  error = '';
 
-    const topics = this.getTopics() as Record<string, any>;
-    this.lessons = topics[topicSlug] || [];
-    this.topic = this.lessons.find((l: any) => l.slug === lessonSlug) || this.lessons[0];
-    this.index = this.topic ? this.lessons.findIndex((l: any) => l.slug === this.topic.slug) : 0;
+  get sectionCount(): number {
+    return this.note ? noteSectionCount(this.note) : 0;
   }
 
-  get previous() {
-    return this.index > 0 ? this.lessons[this.index - 1] : null;
-  }
+  ngOnInit(): void {
+    this.topic = this.route.snapshot.paramMap.get('topic') ?? 'Reading room';
+    const id = this.route.snapshot.paramMap.get('lesson');
 
-  get next() {
-    return this.index < this.lessons.length - 1 ? this.lessons[this.index + 1] : null;
-  }
+    if (!id) {
+      this.error = 'This reading item is missing an identifier.';
+      this.loading = false;
+      return;
+    }
 
-  getTopics() {
-    return {
-      csharp: {
-        topic: 'C# Basics',
-        slug: 'csharp',
-        lessons: [
-          { slug: 'introduction', title: 'Introduction' },
-          { slug: 'variables', title: 'Variables' },
-          { slug: 'data-types', title: 'Data Types' },
-        ],
+    forkJoin({
+      note: this.api.getById(id),
+      notes: this.api.getPublicNotes().pipe(catchError(() => of([])))
+    }).subscribe({
+      next: result => {
+        this.note = result.note;
+        this.docsNotes = result.notes;
+        this.loading = false;
       },
-      angular: {
-        topic: 'Angular',
-        slug: 'angular',
-        lessons: [
-          { slug: 'introduction', title: 'Introduction' },
-          { slug: 'components', title: 'Components' },
-        ],
-      },
-      dotnet: {
-        topic: '.NET',
-        slug: 'dotnet',
-        lessons: [
-          { slug: 'introduction', title: 'Introduction' },
-          { slug: 'webpack', title: 'Webpack configuration' },
-        ],
-      },
-    };
+      error: () => {
+        this.error = 'This note could not be loaded.';
+        this.loading = false;
+      }
+    });
   }
 }

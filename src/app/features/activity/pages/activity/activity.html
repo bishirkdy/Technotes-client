@@ -1,17 +1,51 @@
 <div class="space-y-6">
-  <div>
-    <h1 class="text-3xl font-bold">Activity</h1>
-    <p class="mt-1 text-sm text-gray-500">Recent changes in your workspace.</p>
-  </div>
+  <app-page-header
+    eyebrow="Workspace"
+    title="Activity"
+    description="Creation and update timestamps recorded on your notes."
+  >
+    <a routerLink="/app/notes" class="btn-ghost text-xs">Go to my notes</a>
+  </app-page-header>
 
-  <div class="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
-    <p class="font-medium text-gray-700">Activity tracking is not available yet</p>
-    <p class="mx-auto mt-2 max-w-xl text-sm text-gray-500">
-      The backend does not record note history, so there is no activity feed to display.
-      Open your notes list to review what you have created.
-    </p>
-    <a routerLink="/app/notes" class="mt-5 inline-block text-sm font-semibold text-gray-900">
-      Go to my notes &rarr;
-    </a>
-  </div>
+  @if (loading) {
+    <div class="space-y-3">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <div class="skeleton h-20 rounded-3xl"></div>
+      }
+    </div>
+  } @else if (error) {
+    <app-empty-state title="Could not load activity" [message]="error">
+      <button type="button" class="btn-ghost text-xs" (click)="load()">Try again</button>
+    </app-empty-state>
+  } @else if (entries.length === 0) {
+    <app-empty-state
+      title="No activity yet"
+      message="Timestamps appear here once you create or update a note."
+    >
+      <a routerLink="/app/notes/create" class="btn-primary text-xs">Create a note</a>
+    </app-empty-state>
+  } @else {
+    <div class="glass-panel rounded-3xl p-5 sm:p-6">
+      <ol class="relative space-y-1">
+        @for (entry of entries; track entry.id; let last = $last) {
+          <li class="relative flex gap-4 pb-6" [class.pb-0]="last">
+            <div class="relative flex flex-col items-center">
+              <span class="mt-1.5 h-2.5 w-2.5 rounded-full border border-acid-400/40 bg-acid-400"></span>
+              @if (!last) {
+                <span class="mt-1 w-px flex-1 bg-white/10"></span>
+              }
+            </div>
+
+            <a [routerLink]="['/notes', entry.noteId]" class="group min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm font-semibold text-mist-100 transition group-hover:text-acid-300">{{ entry.title }}</span>
+                <span class="badge-neutral">{{ entry.label }}</span>
+              </div>
+              <p class="mt-1 text-xs text-mist-500">{{ entry.timestamp | date: 'MMM d, y · h:mm a' }}</p>
+            </a>
+          </li>
+        }
+      </ol>
+    </div>
+  }
 </div>

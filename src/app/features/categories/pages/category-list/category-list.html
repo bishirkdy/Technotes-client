@@ -1,20 +1,191 @@
-<div class="mx-auto max-w-7xl px-6 py-10">
-  <div>
-    <p class="text-sm font-medium text-gray-500">Explore</p>
-    <h1 class="mt-1 text-4xl font-bold text-gray-900">Categories</h1>
-    <p class="mt-2 max-w-2xl text-sm text-gray-500">
-      Group related notes into reusable topics.
-    </p>
-  </div>
+<div class="space-y-6">
+  <app-page-header
+    eyebrow="Organize"
+    title="Categories"
+    description="Create groups and child categories, then assign notes to one primary category and reusable tags."
+  >
+    <button type="button" class="btn-primary text-xs" (click)="startCreate()">
+      + New group
+    </button>
+  </app-page-header>
 
-  <div class="mt-8 rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
-    <p class="font-medium text-gray-700">Categories are not available yet</p>
-    <p class="mx-auto mt-2 max-w-xl text-sm text-gray-500">
-      Notes store a category identifier, but the current backend does not expose endpoints for
-      creating or listing categories. Browse public notes until category management is added.
-    </p>
-    <a routerLink="/notes" class="mt-5 inline-block text-sm font-semibold text-gray-900">
-      Browse public notes &rarr;
-    </a>
-  </div>
+  @if (error && !loading) {
+    <div class="rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-200">
+      {{ error }}
+    </div>
+  }
+  @if (success) {
+    <div class="rounded-2xl border border-acid-400/20 bg-acid-400/10 px-4 py-3 text-sm text-acid-200">
+      {{ success }}
+    </div>
+  }
+
+  @if (loading) {
+    <div class="grid gap-5 lg:grid-cols-[22rem_minmax(0,1fr)]">
+      <div class="skeleton h-96 rounded-3xl"></div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        @for (item of [1, 2, 3, 4]; track item) {
+          <div class="skeleton h-56 rounded-3xl"></div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="grid items-start gap-5 lg:grid-cols-[22rem_minmax(0,1fr)]">
+      <section class="glass-panel rounded-3xl p-5 lg:sticky lg:top-24">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-semibold text-mist-50">
+              {{ editing ? 'Edit category' : form.parentCategoryId ? 'New child category' : 'New group' }}
+            </h2>
+            <p class="mt-1 text-xs text-mist-500">
+              Notes use the child category; groups organize the sidebar and browse pages.
+            </p>
+          </div>
+          @if (editing || form.parentCategoryId) {
+            <button type="button" class="btn-ghost min-h-8 px-3 text-[11px]" (click)="cancel()">
+              Cancel
+            </button>
+          }
+        </div>
+
+        <label class="field-label mt-5">
+          Name
+          <input
+            [(ngModel)]="form.name"
+            maxlength="100"
+            placeholder="e.g. AWS"
+            class="field mt-2"
+          />
+        </label>
+
+        <label class="field-label mt-4">
+          Description
+          <textarea
+            [(ngModel)]="form.description"
+            maxlength="500"
+            rows="3"
+            placeholder="Optional description"
+            class="field mt-2 resize-y"
+          ></textarea>
+        </label>
+
+        <label class="field-label mt-4">
+          Parent group
+          <select
+            [(ngModel)]="form.parentCategoryId"
+            [disabled]="editingHasChildren"
+            class="field mt-2 disabled:opacity-60"
+          >
+            <option [ngValue]="null">Top-level group</option>
+            @for (group of groups; track group.id) {
+              @if (group.id !== form.id) {
+                <option [ngValue]="group.id">{{ group.name }}</option>
+              }
+            }
+          </select>
+        </label>
+        @if (editingHasChildren) {
+          <p class="mt-2 text-[11px] leading-5 text-mist-500">
+            Move this group's children before making it a child category.
+          </p>
+        }
+
+        <label class="field-label mt-4">
+          Sort order
+          <input
+            [(ngModel)]="form.sortOrder"
+            type="number"
+            min="0"
+            step="10"
+            class="field mt-2"
+          />
+        </label>
+
+        <button
+          type="button"
+          class="btn-primary mt-5 w-full text-xs disabled:opacity-60"
+          [disabled]="saving"
+          (click)="save()"
+        >
+          {{ saving ? 'Saving...' : editing ? 'Save changes' : 'Create category' }}
+        </button>
+      </section>
+
+      <section>
+        @if (tree.length === 0) {
+          <app-empty-state
+            title="No categories yet"
+            message="Create a top-level group such as Languages, then add child categories."
+          >
+            <button type="button" class="btn-primary text-xs" (click)="startCreate()">
+              Create a group
+            </button>
+          </app-empty-state>
+        } @else {
+          <div class="grid gap-4 xl:grid-cols-2">
+            @for (group of tree; track group.id) {
+              <article class="glass-card flex flex-col rounded-3xl p-5">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-acid-300">
+                      Group
+                    </p>
+                    <h2 class="mt-1 truncate text-xl font-semibold tracking-[-0.03em] text-mist-50">
+                      {{ group.name }}
+                    </h2>
+                    @if (group.description) {
+                      <p class="mt-2 text-xs leading-5 text-mist-400">{{ group.description }}</p>
+                    }
+                  </div>
+                  <span class="badge-neutral shrink-0">
+                    {{ group.noteCount }} {{ group.noteCount === 1 ? 'note' : 'notes' }}
+                  </span>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <button type="button" class="btn-ghost min-h-8 px-3 text-[11px]" (click)="startCreate(group.id)">
+                    + Child
+                  </button>
+                  <button type="button" class="btn-ghost min-h-8 px-3 text-[11px]" (click)="startEdit(asCategory(group))">
+                    Edit
+                  </button>
+                  <button type="button" class="btn-danger min-h-8 px-3 text-[11px]" (click)="remove(asCategory(group))">
+                    Delete
+                  </button>
+                </div>
+
+                <div class="mt-4 flex-1 space-y-2 border-t border-white/10 pt-4">
+                  @if (group.children.length === 0) {
+                    <p class="rounded-xl border border-dashed border-white/10 px-3 py-4 text-center text-xs text-mist-500">
+                      No child categories yet.
+                    </p>
+                  } @else {
+                    @for (child of group.children; track child.id) {
+                      <div class="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5">
+                        <div class="min-w-0 flex-1">
+                          <p class="truncate text-sm font-medium text-mist-100">{{ child.name }}</p>
+                          @if (child.description) {
+                            <p class="truncate text-[11px] text-mist-500">{{ child.description }}</p>
+                          }
+                        </div>
+                        <span class="shrink-0 text-[10px] tabular-nums text-mist-500">
+                          {{ child.noteCount }}
+                        </span>
+                        <button type="button" class="shrink-0 text-[11px] text-mist-400 hover:text-acid-300" (click)="startEdit(asCategory(child))">
+                          Edit
+                        </button>
+                        <button type="button" class="shrink-0 text-[11px] text-rose-400 hover:text-rose-300" (click)="remove(asCategory(child))">
+                          Delete
+                        </button>
+                      </div>
+                    }
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
 </div>

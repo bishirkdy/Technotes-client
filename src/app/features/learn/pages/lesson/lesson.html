@@ -1,53 +1,90 @@
-<div class="p-6">
-  <h2 class="text-xl font-bold text-gray-900">{{ topic?.topic }}</h2>
+<app-navbar />
 
-  @if (topic) {
-    <div class="mt-4">
-      <p class="text-sm text-gray-500">{{ topic.introduction || topic.slug }}</p>
+<main class="page-shell py-12 sm:py-16">
+  <div class="grid items-start gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
+    <app-docs-sidebar
+      [notes]="docsNotes"
+      [currentNoteId]="note?.id || ''"
+      [currentCategory]="note?.categoryName || topic"
+      [singleNote]="true"
+      mode="learn"
+    />
 
-      @if (topic.introduction) {
-        <p><strong>Introduction:</strong> {{ topic.introduction }}</p>
-      }
+    <div class="min-w-0">
+      <nav class="flex flex-wrap items-center gap-2 text-xs text-mist-500">
+        <a routerLink="/learn" class="transition hover:text-acid-300">Reading room</a>
+        <span>/</span>
+        <a [routerLink]="['/learn', topic]" class="transition hover:text-acid-300">{{ topic }}</a>
+        @if (note) {
+          <span>/</span>
+          <span class="truncate text-mist-300">{{ note.title }}</span>
+        }
+      </nav>
 
-      @if (topic.variables) {
-        <p><strong>Variables:</strong> {{ topic.variables }}</p>
-      }
+      @if (loading) {
+        <div class="mt-8">
+          <div class="skeleton h-56 rounded-4xl"></div>
+          <div class="skeleton mt-6 h-72 rounded-3xl"></div>
+        </div>
+      } @else if (error) {
+        <div class="mt-8">
+          <app-empty-state title="Reading item unavailable" [message]="error">
+            <a [routerLink]="['/learn', topic]" class="btn-ghost text-xs">Back to track</a>
+          </app-empty-state>
+        </div>
+      } @else if (note) {
+        <header class="glass-panel mt-8 rounded-4xl p-6 sm:p-10">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="badge">{{ note.categoryName || topic }}</span>
+            <span class="badge-neutral">{{ sectionCount }} sections</span>
+          </div>
 
-      @if (topic.dataTypes) {
-        <p><strong>Data Types:</strong> {{ topic.dataTypes }}</p>
-      }
+          <h1 class="mt-6 max-w-4xl text-4xl font-semibold tracking-[-0.055em] text-mist-50 sm:text-6xl">
+            {{ note.title }}
+          </h1>
 
-      @if (topic.classes) {
-        <p><strong>Classes:</strong> {{ topic.classes }}</p>
-      }
+          <div class="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-mist-400">
+            @if (note.updatedAtUtc) {
+              <span>Updated {{ note.updatedAtUtc | date: 'MMM d, y' }}</span>
+            }
+            @if (note.createdAtUtc) {
+              <span>Published {{ note.createdAtUtc | date: 'MMM d, y' }}</span>
+            }
+          </div>
 
-      @if (topic.inheritance) {
-        <p><strong>Inheritance:</strong> {{ topic.inheritance }}</p>
-      }
+          @if (note.tags?.length) {
+            <div class="mt-5 flex flex-wrap gap-1.5">
+              @for (tag of note.tags; track tag) {
+                <span class="badge-neutral">#{{ tag }}</span>
+              }
+            </div>
+          }
 
-      @if (topic.sql) {
-        <p><strong>SQL:</strong> {{ topic.sql }}</p>
-      }
+          <div class="mt-6 max-w-sm">
+            <app-reading-progress
+              [noteId]="note.id"
+              [initialPercent]="note.readingProgress?.percent ?? 0"
+            />
+          </div>
+        </header>
 
-      @if (topic.orm) {
-        <p><strong>ORM:</strong> {{ topic.orm }}</p>
+        <div class="mt-6">
+          <app-note-reader [sections]="note.sections" />
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-2">
+          <a [routerLink]="['/learn', topic]" class="btn-ghost text-xs">← Back to {{ topic }}</a>
+          <a [routerLink]="['/notes', note.id]" class="btn-ghost text-xs">Open full note page</a>
+        </div>
+      } @else {
+        <div class="mt-8">
+          <app-empty-state title="Reading item not found" message="This note may have been removed or is not available.">
+            <a [routerLink]="['/learn', topic]" class="btn-ghost text-xs">Back to track</a>
+          </app-empty-state>
+        </div>
       }
     </div>
-  }
+  </div>
+</main>
 
-  @if (previous) {
-    <div class="mt-4">
-      <a routerLink="/learn/{{ previous.slug }}" class="text-blue-600 hover underline">
-        Previous: {{ previous.topic }}
-      </a>
-    </div>
-  }
-
-  @if (next) {
-    <div class="mt-4">
-      <a routerLink="/learn/{{ next.slug }}" class="text-blue-600 hover underline">
-        Next: {{ next.topic }} →
-      </a>
-    </div>
-  }
-</div>
+<app-footer />

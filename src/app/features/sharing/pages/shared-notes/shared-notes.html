@@ -1,14 +1,34 @@
 <div class="space-y-6">
-  <div>
-    <h1 class="text-3xl font-bold text-gray-900">Shared Notes</h1>
-    <p class="mt-1 text-sm text-gray-500">Notes shared with you will appear here when a sharing API is available.</p>
-  </div>
+  <app-page-header
+    eyebrow="Collaboration"
+    title="Shared with me"
+    description="Notes other people have explicitly shared with your account."
+  >
+    <a routerLink="/app/notes" class="btn-ghost text-xs">Go to my notes</a>
+  </app-page-header>
 
-  <div class="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center">
-    <p class="font-medium text-gray-700">Sharing API not available yet</p>
-    <p class="mt-1 text-sm text-gray-400">
-      The current backend exposes public notes, but no endpoint for notes shared with the current user.
-    </p>
-    <a routerLink="/notes" class="mt-5 inline-block text-sm font-semibold">Browse public notes &rarr;</a>
-  </div>
+  @if (loading) {
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      @for (item of [1, 2, 3]; track item) {
+        <div class="skeleton h-64 rounded-3xl"></div>
+      }
+    </div>
+  } @else if (error) {
+    <app-empty-state title="Could not load shared notes" [message]="error">
+      <button type="button" class="btn-ghost text-xs" (click)="load()">Try again</button>
+    </app-empty-state>
+  } @else if (notes.length === 0) {
+    <app-empty-state
+      title="Nothing shared with you"
+      message="When another user shares a note with your account, it will appear here."
+    >
+      <a routerLink="/notes" class="btn-ghost text-xs">Browse documentation</a>
+    </app-empty-state>
+  } @else {
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      @for (note of notes; track note.id) {
+        <app-note-card [note]="note" />
+      }
+    </div>
+  }
 </div>

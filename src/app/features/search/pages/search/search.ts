@@ -1,24 +1,35 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { NoteResponse } from '../../../../features/notes/models/note-response.model';
-import { noteTextPreview } from '../../../../features/notes/models/note-response.helpers';
-import { NoteApiService } from '../../../../features/notes/services/note-api.service';
+import { ActivatedRoute } from '@angular/router';
+import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
+import { PageHeader } from '../../../../shared/components/page-header/page-header';
+import { NoteCard } from '../../../notes/components/note-card/note-card';
+import { NoteResponse } from '../../../notes/models/note-response.model';
+import { NoteApiService } from '../../../notes/services/note-api.service';
 
 @Component({
   selector: 'app-search',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, EmptyState, PageHeader, NoteCard],
   templateUrl: './search.html',
   styleUrl: './search.css'
 })
 export class Search {
   private readonly api = inject(NoteApiService);
+  private readonly route = inject(ActivatedRoute);
 
   query = '';
   results: NoteResponse[] = [];
   loading = false;
   searched = false;
   error = '';
+
+  ngOnInit(): void {
+    const initial = this.route.snapshot.queryParamMap.get('q')?.trim() ?? '';
+    if (initial) {
+      this.query = initial;
+      this.search();
+    }
+  }
 
   search(): void {
     const query = this.query.trim();
@@ -42,9 +53,5 @@ export class Search {
         this.loading = false;
       }
     });
-  }
-
-  preview(note: NoteResponse): string {
-    return noteTextPreview(note) || 'Open the note to read more.';
   }
 }
