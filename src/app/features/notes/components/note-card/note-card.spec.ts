@@ -51,6 +51,14 @@ describe('NoteCard', () => {
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('Angular signals');
     expect(text).toContain('Signals keep state changes explicit.');
+    expect(text).toContain('Documentation');
+    expect(text).not.toContain('Public');
+  });
+
+  it('should show visibility only in authoring views', () => {
+    component.showVisibility = true;
+    fixture.detectChanges();
+    const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('Public');
   });
 

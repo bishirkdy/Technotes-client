@@ -8,6 +8,7 @@ export const CONTENT_TYPE_TO_API: Record<ContentBlockType, number> = {
   example: 5,
   table: 6,
   code: 7,
+  image: 8,
   graph: 9,
   quote: 10
 };
@@ -19,6 +20,7 @@ export const API_TYPE_TO_CONTENT: Record<number, ContentBlockType> = {
   5: 'example',
   6: 'table',
   7: 'code',
+  8: 'image',
   9: 'graph',
   10: 'quote'
 };
@@ -37,6 +39,8 @@ export function contentBlockLabel(type: ContentBlockType): string {
       return 'Code';
     case 'table':
       return 'Table';
+    case 'image':
+      return 'Image';
     case 'graph':
       return 'Graph';
     case 'quote':

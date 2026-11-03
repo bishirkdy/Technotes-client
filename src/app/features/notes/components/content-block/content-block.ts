@@ -6,6 +6,7 @@ import { PointsBlock } from '../content-blocks/points-block/points-block';
 import { ExampleBlock } from '../content-blocks/example-block/example-block';
 import { CodeBlock } from '../content-blocks/code-block/code-block';
 import { TableBlock } from '../content-blocks/table-block/table-block';
+import { ImageBlock } from '../content-blocks/image-block/image-block';
 import { GraphBlock } from '../content-blocks/graph-block/graph-block';
 import { QuoteBlock } from '../content-blocks/quote-block/quote-block';
 import { ContentBlockModel, } from '../../models/content-block.model';
@@ -13,7 +14,7 @@ import { ContentBlockType } from '../../models/content-block-type.model';
 
 @Component({
   selector: 'app-content-block',
-  imports: [ContentBlockToolbar, TextBlock, DefinitionBlock, PointsBlock, ExampleBlock, CodeBlock, TableBlock, GraphBlock, QuoteBlock],
+  imports: [ContentBlockToolbar, TextBlock, DefinitionBlock, PointsBlock, ExampleBlock, CodeBlock, TableBlock, ImageBlock, GraphBlock, QuoteBlock],
   templateUrl: './content-block.html',
   styleUrl: './content-block.css',
 })
@@ -68,8 +69,9 @@ export class ContentBlock {
       case 'definition': return { term: '', definition: '', example: '' };
       case 'points': return { points: [''] };
       case 'example': return { title: '', description: '', code: '', result: '' };
-      case 'code': return { language: 'csharp', filename: '', code: '', showLineNumbers: true, wrapCode: false };
+      case 'code': return { language: 'csharp', dialect: null, filename: '', code: '', showLineNumbers: true, wrapCode: false, runnable: true };
       case 'table': return { title: '', description: '', columns: ['Column 1', 'Column 2'], rows: [['', '']] };
+      case 'image': return { url: '', publicId: '', width: null, height: null, alt: '', caption: '' };
       case 'graph': return { title: '', graphType: 'bar', rows: [] };
       case 'quote': return { quote: '', author: '', source: '' };
     }

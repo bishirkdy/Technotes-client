@@ -8,6 +8,8 @@ import { ContentBlockModel } from '../../models/content-block.model';
 import { NoteStatus } from '../../models/note-status.model';
 import { NoteVisibility } from '../../models/note-visibility.model';
 import { ContentBlock } from '../../components/content-block/content-block';
+import { CategoryApiService } from '../../../categories/services/category-api.service';
+import { CategoryResponse } from '../../../categories/models/category.model';
 
 @Component({
   selector: 'app-note-create',
@@ -17,6 +19,7 @@ import { ContentBlock } from '../../components/content-block/content-block';
 })
 export class NoteCreate {
   private readonly noteApi = inject(NoteApiService);
+  private readonly categoryApi = inject(CategoryApiService);
   private readonly router = inject(Router);
 
   readonly statuses = [
@@ -30,14 +33,37 @@ export class NoteCreate {
     status: NoteStatus.Draft,
     folderId: null,
     categoryId: null,
+    tags: [],
     sections: []
   };
+
+  categories: CategoryResponse[] = [];
+  tagsInput = '';
 
   activeSectionId: number | null = null;
   loading = false;
   saved = false;
   error = '';
   submitted = false;
+
+  ngOnInit(): void {
+    this.categoryApi.list().subscribe({
+      next: categories => this.categories = categories,
+      error: () => this.categories = []
+    });
+  }
+
+  get categoryGroups(): CategoryResponse[] {
+    return this.categories.filter(category => !category.parentCategoryId);
+  }
+
+  get childCategories(): CategoryResponse[] {
+    return this.categories.filter(category => category.parentCategoryId);
+  }
+
+  childrenOf(groupId: string): CategoryResponse[] {
+    return this.childCategories.filter(category => category.parentCategoryId === groupId);
+  }
 
   get activeSection(): NoteSectionModel | null {
     return this.activeSectionId === null ? null : this.findSection(this.note.sections, this.activeSectionId);
@@ -100,6 +126,7 @@ export class NoteCreate {
     }
 
     this.normalizeSections(this.note.sections);
+    this.note.tags = this.parseTags(this.tagsInput);
     this.loading = true;
     this.noteApi.create(this.note).subscribe({
       next: response => {
@@ -108,11 +135,15 @@ export class NoteCreate {
         this.router.navigate(['/notes', response.id]);
       },
       error: error => {
-        console.error(error);
         this.loading = false;
         this.error = this.getError(error, 'Unable to save note.');
       }
     });
+  }
+
+  blockCount(): number {
+    return this.flattenSections(this.note.sections)
+      .reduce((total, item) => total + item.section.contents.length, 0);
   }
 
   flattenSections(sections: NoteSectionModel[], level = 0, prefix = ''): Array<{ section: NoteSectionModel; level: number; number: string }> {
@@ -159,5 +190,21 @@ export class NoteCreate {
 
   private getError(error: any, fallback: string): string {
     return error?.error?.detail || error?.error?.message || error?.message || fallback;
+  }
+
+  private parseTags(value: string): string[] {
+    const seen = new Set<string>();
+    const tags: string[] = [];
+
+    for (const item of value.split(',')) {
+      const tag = item.trim();
+      const key = tag.toLowerCase();
+      if (tag && !seen.has(key)) {
+        seen.add(key);
+        tags.push(tag);
+      }
+    }
+
+    return tags;
   }
 }

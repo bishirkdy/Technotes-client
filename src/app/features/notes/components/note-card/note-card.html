@@ -1,22 +1,55 @@
-<article class="rounded-2xl border border-gray-200 bg-white p-6">
-  <div class="flex justify-between gap-3">
-    <span class="rounded-full bg-gray-100 px-2.5 py-1 text-xs">{{ visibilityLabel }}</span>
-    <span class="text-xs text-gray-400">{{ sectionCount }} {{ sectionCount === 1 ? 'section' : 'sections' }}</span>
+<article class="glass-card glass-card-hover group flex h-full flex-col p-6">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex flex-wrap gap-1.5">
+      <span class="badge">{{ note.categoryName || 'Documentation' }}</span>
+      @if (showVisibility) {
+        <span class="badge-neutral">{{ visibilityLabel }}</span>
+      }
+    </div>
+    <span class="text-[10px] uppercase tracking-[0.18em] text-mist-500">
+      {{ sectionCount }} {{ sectionCount === 1 ? 'section' : 'sections' }}
+    </span>
   </div>
 
-  <h2 class="mt-5 text-lg font-semibold text-gray-900">{{ note.title }}</h2>
-  <p class="mt-2 line-clamp-3 text-sm leading-6 text-gray-500">{{ preview }}</p>
+  <h2 class="mt-5 text-xl font-semibold tracking-[-0.03em] text-mist-50">
+    <a [routerLink]="['/notes', note.id]" class="transition group-hover:text-acid-300">{{ note.title }}</a>
+  </h2>
 
-  <div class="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
-    <a [routerLink]="['/notes', note.id]" class="text-sm font-semibold text-gray-900">Open &rarr;</a>
+  <p class="mt-3 line-clamp-3 flex-1 text-sm leading-7 text-mist-300">{{ preview }}</p>
 
-    @if (editable) {
-      <div class="flex gap-3">
-        <a [routerLink]="['/app/notes/edit', note.id]" class="text-xs text-gray-500">Edit</a>
-        <button (click)="requestDelete()" [disabled]="deleting" class="text-xs text-red-500 disabled:opacity-50">
-          {{ deleting ? 'Deleting...' : 'Delete' }}
-        </button>
+  @if (note.readingProgress; as progress) {
+    <div class="mt-4 flex items-center gap-2">
+      <div class="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+        <div class="h-full rounded-full bg-acid-400" [style.width.%]="progress.percent"></div>
       </div>
-    }
+      <span class="text-[10px] tabular-nums text-mist-500">{{ progress.percent }}%</span>
+    </div>
+  }
+
+  @if (note.tags?.length) {
+    <div class="mt-4 flex flex-wrap gap-1.5">
+      @for (tag of note.tags!.slice(0, 4); track tag) {
+        <span class="badge-neutral">#{{ tag }}</span>
+      }
+    </div>
+  }
+
+  <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
+    <a [routerLink]="['/notes', note.id]" class="text-xs font-semibold text-acid-300">Read →</a>
+
+    <div class="flex items-center gap-3">
+      <span class="text-[10px] text-mist-500">{{ date | date: 'MMM d, y' }}</span>
+      @if (editable) {
+        <a [routerLink]="['/app/notes/edit', note.id]" class="text-xs text-mist-400 transition hover:text-mist-50">Edit</a>
+        <button
+          type="button"
+          (click)="requestDelete()"
+          [disabled]="deleting"
+          class="text-xs text-rose-400 transition hover:text-rose-300 disabled:opacity-50"
+        >
+          {{ deleting ? 'Deleting…' : 'Delete' }}
+        </button>
+      }
+    </div>
   </div>
 </article>

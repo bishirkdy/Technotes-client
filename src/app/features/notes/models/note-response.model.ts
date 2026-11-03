@@ -8,5 +8,15 @@ export interface NoteResponse {
   userId: string;
   folderId: string | null;
   categoryId: string | null;
+  categoryName?: string | null;
+  categoryParentName?: string | null;
+  categoryPath?: string[];
+  tags?: string[];
+  createdAtUtc?: string;
+  updatedAtUtc?: string;
+  readingProgress?: {
+    percent: number;
+    lastReadAtUtc: string;
+  } | null;
   sections: NoteSectionResponse[];
 }

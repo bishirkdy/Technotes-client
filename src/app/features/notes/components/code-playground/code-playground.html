@@ -1,0 +1,108 @@
+<dialog
+  #dialog
+  class="playground"
+  (cancel)="close()"
+  (click)="onBackdrop($event)"
+  aria-label="Try this example"
+>
+  <div class="playground__panel">
+    <header class="playground__header">
+      <div class="min-w-0">
+        <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-acid-300">Try it yourself</p>
+        <h2 class="mt-1 truncate text-base font-semibold text-mist-100">
+          {{ example.filename || 'Interactive example' }}
+        </h2>
+      </div>
+
+      <div class="flex shrink-0 items-center gap-2">
+        <button type="button" (click)="run()" class="playground__button playground__button--primary">Run</button>
+        <button type="button" (click)="reset()" class="playground__button">Reset</button>
+        <button type="button" (click)="copyActive()" class="playground__button">{{ copied() ? 'Copied' : 'Copy' }}</button>
+        <button type="button" (click)="close()" class="playground__button playground__button--close" aria-label="Close">Esc</button>
+      </div>
+    </header>
+
+    <div class="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-2">
+      <section class="flex min-h-0 flex-col border-b border-white/10 lg:border-b-0 lg:border-r">
+        <div class="flex items-center gap-1 border-b border-white/10 px-3 py-2">
+          @for (tab of ['html', 'css', 'js']; track tab) {
+            <button
+              type="button"
+              (click)="setTab($any(tab))"
+              class="rounded-md px-3 py-1.5 text-[11px] font-semibold transition"
+              [class.bg-white/10]="activeTab() === tab"
+              [class.text-mist-100]="activeTab() === tab"
+              [class.text-mist-500]="activeTab() !== tab"
+            >
+              {{ tabLabel($any(tab)) }}
+            </button>
+          }
+          <span class="ml-auto text-[10px] text-mist-600">HTML · CSS · JS</span>
+        </div>
+
+        <div class="min-h-[240px] flex-1 p-3">
+          @if (activeTab() === 'html') {
+            <textarea
+              class="playground__editor"
+              spellcheck="false"
+              aria-label="HTML editor"
+              [value]="html()"
+              (input)="html.set($any($event.target).value)"
+            ></textarea>
+          } @else if (activeTab() === 'css') {
+            <textarea
+              class="playground__editor"
+              spellcheck="false"
+              aria-label="CSS editor"
+              [value]="css()"
+              (input)="css.set($any($event.target).value)"
+            ></textarea>
+          } @else {
+            <textarea
+              class="playground__editor"
+              spellcheck="false"
+              aria-label="JavaScript editor"
+              [value]="js()"
+              (input)="js.set($any($event.target).value)"
+            ></textarea>
+          }
+        </div>
+      </section>
+
+      <section class="flex min-h-0 flex-col">
+        <div class="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
+          <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-mist-500">Result</span>
+          <span class="ml-auto inline-flex items-center gap-1.5 text-[10px] text-mist-500">
+            <span class="h-1.5 w-1.5 rounded-full bg-acid-400"></span>
+            sandboxed preview
+          </span>
+        </div>
+
+        <iframe
+          #preview
+          class="min-h-[240px] flex-1 bg-white"
+          title="Example preview"
+          sandbox="allow-scripts"
+          referrerpolicy="no-referrer"
+        ></iframe>
+
+        <div class="h-36 shrink-0 border-t border-white/10 bg-ink-950/80">
+          <div class="flex items-center gap-2 px-4 py-2">
+            <span class="text-[10px] font-semibold uppercase tracking-[0.14em] text-mist-500">Console</span>
+            <span class="text-[10px] text-mist-600">{{ logs().length }}</span>
+          </div>
+          <div class="h-24 space-y-1 overflow-y-auto px-4 pb-3 font-mono text-[11px] leading-5">
+            @if (logs().length === 0) {
+              <p class="text-mist-600">No console output.</p>
+            }
+            @for (log of logs(); track $index) {
+              <p [class.text-red-300]="log.level === 'error'" [class.text-amber-300]="log.level === 'warn'" [class.text-mist-400]="log.level === 'log' || log.level === 'info'">
+                <span class="mr-1 text-mist-600">›</span>{{ log.text }}
+              </p>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</dialog>

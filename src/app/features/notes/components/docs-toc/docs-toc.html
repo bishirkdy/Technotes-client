@@ -1,0 +1,33 @@
+<ng-template #contents>
+  <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-mist-500">On this page</p>
+  <nav class="mt-4 border-l border-white/10" aria-label="On this page">
+    @for (item of items; track item.section.id) {
+      <a
+        [href]="'#' + item.anchor"
+        class="block border-l-2 border-transparent py-1.5 pr-1 text-[13px] leading-5 transition hover:text-mist-100"
+        [style.padding-left.px]="12 + item.level * 12"
+        [class.border-acid-400]="activeAnchor() === item.anchor"
+        [class.text-acid-300]="activeAnchor() === item.anchor"
+        [class.text-mist-400]="activeAnchor() !== item.anchor"
+        [attr.aria-current]="activeAnchor() === item.anchor ? 'location' : null"
+      >
+        {{ item.section.title }}
+      </a>
+    }
+  </nav>
+</ng-template>
+
+@if (items.length > 0) {
+  <details class="glass-panel rounded-2xl p-4 xl:hidden">
+    <summary class="cursor-pointer list-none text-sm font-semibold text-mist-100">On this page</summary>
+    <div class="mt-4 border-t border-white/10 pt-3">
+      <ng-container [ngTemplateOutlet]="contents" />
+    </div>
+  </details>
+
+  <aside class="hidden xl:block">
+    <div class="sticky top-24 rounded-2xl border border-white/10 bg-ink-950/55 p-4 backdrop-blur">
+      <ng-container [ngTemplateOutlet]="contents" />
+    </div>
+  </aside>
+}

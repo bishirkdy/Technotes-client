@@ -1,0 +1,34 @@
+@if (code) {
+  <figure class="code-card">
+    <figcaption class="code-card__header">
+      <span class="min-w-0 truncate font-mono text-[11px] text-mist-300">{{ title }}</span>
+      @if (dialectName) {
+        <span class="code-card__dialect">{{ dialectName }}</span>
+      }
+      <span class="ml-auto flex items-center gap-2">
+        @if (canRun) {
+          <button type="button" (click)="run()" class="code-card__action code-card__action--run">
+            {{ actionLabel }}
+          </button>
+        }
+        <button type="button" (click)="copy()" class="code-card__action">
+          {{ copied() ? 'Copied' : 'Copy' }}
+        </button>
+      </span>
+    </figcaption>
+
+    <div class="code-card__body" [class.code-card__body--wrap]="wrapCode">
+      @if (showNumbers) {
+        <pre class="code-card__numbers" aria-hidden="true">{{ lineNumbers().join('\n') }}</pre>
+      }
+      <pre class="code-card__code"><code class="hljs" [innerHTML]="highlighted()"></code></pre>
+    </div>
+
+    @if (expectedOutput) {
+      <div class="code-card__output">
+        <span class="code-card__output-label">Expected output</span>
+        <pre class="code-card__output-value">{{ expectedOutput }}</pre>
+      </div>
+    }
+  </figure>
+}

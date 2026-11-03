@@ -6,5 +6,6 @@ export interface UpdateNoteRequest {
   status: number;
   folderId: string | null;
   categoryId: string | null;
+  tags: string[];
   sections: NoteSectionRequest[];
 }

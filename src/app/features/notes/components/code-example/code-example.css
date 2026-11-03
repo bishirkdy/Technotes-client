@@ -1,0 +1,108 @@
+.code-card {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 0.9rem;
+  background: rgb(8 11 18 / 0.9);
+}
+
+.code-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  background: rgb(255 255 255 / 0.025);
+  padding: 0.55rem 0.75rem 0.55rem 1rem;
+}
+
+.code-card__dialect {
+  flex: 0 0 auto;
+  border: 1px solid rgb(34 211 238 / 0.24);
+  border-radius: 999px;
+  background: rgb(34 211 238 / 0.08);
+  padding: 0.15rem 0.5rem;
+  color: rgb(165 243 252);
+  font-size: 0.6rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  line-height: 1rem;
+}
+
+.code-card__action {
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 0.45rem;
+  padding: 0.25rem 0.55rem;
+  color: rgb(168 178 196);
+  font-size: 0.68rem;
+  line-height: 1rem;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.code-card__action:hover {
+  border-color: rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 0.05);
+  color: rgb(241 245 249);
+}
+
+.code-card__action--run {
+  border-color: rgb(163 230 53 / 0.3);
+  background: rgb(163 230 53 / 0.1);
+  color: rgb(190 242 100);
+}
+
+.code-card__body {
+  display: flex;
+  overflow-x: auto;
+  padding: 0.85rem 0;
+}
+
+.code-card__numbers {
+  flex: 0 0 auto;
+  border-right: 1px solid rgb(255 255 255 / 0.06);
+  padding: 0 0.8rem 0 1rem;
+  color: rgb(90 100 118);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.76rem;
+  line-height: 1.7;
+  text-align: right;
+  user-select: none;
+}
+
+.code-card__code {
+  min-width: 0;
+  flex: 1;
+  padding: 0 1rem;
+  color: rgb(203 213 225);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.76rem;
+  line-height: 1.7;
+  tab-size: 2;
+}
+
+.code-card__body--wrap .code-card__code,
+.code-card__body--wrap .code-card__code code {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.code-card__output {
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+  padding: 0.7rem 1rem 0.8rem;
+}
+
+.code-card__output-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: rgb(115 126 145);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.code-card__output-value {
+  color: rgb(190 242 100 / 0.9);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

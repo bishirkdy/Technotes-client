@@ -6,5 +6,6 @@ export interface CreateNoteRequest {
   status: number;
   folderId: string | null;
   categoryId: string | null;
+  tags: string[];
   sections: NoteSectionRequest[];
 }

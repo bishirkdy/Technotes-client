@@ -1,39 +1,78 @@
-<div class="min-h-screen bg-gray-50">
-  <header class="border-b border-gray-200 bg-white">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-      <a routerLink="/" class="text-xl font-bold text-gray-900">TechNotes</a>
-      <nav class="flex items-center gap-5 text-sm text-gray-600">
-        <a routerLink="/learn" class="hover:text-gray-900">Learn</a>
-        <a routerLink="/notes" class="font-semibold text-gray-900">Explore</a>
-        <a routerLink="/login" class="rounded-lg border border-gray-200 px-3 py-2">Sign in</a>
-      </nav>
-    </div>
-  </header>
+<app-navbar />
 
-  <main class="mx-auto max-w-7xl px-6 py-10">
-    <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-500">Explore</p>
-        <h1 class="mt-1 text-4xl font-bold text-gray-900">Public Notes</h1>
-        <p class="mt-2 max-w-2xl text-sm text-gray-500">Discover practical notes shared with the community.</p>
-      </div>
-      <input [(ngModel)]="query" placeholder="Filter by title..." class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none md:w-72" />
-    </div>
+<main class="page-shell py-10 sm:py-14">
+  <div class="grid items-start gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
+    <app-docs-sidebar [notes]="notes" [currentCategory]="category" />
 
-    @if (loading) {
-      <p class="mt-10 text-gray-500">Loading notes...</p>
-    } @else if (error) {
-      <p class="mt-10 text-red-600">{{ error }}</p>
-    } @else if (filteredNotes.length === 0) {
-      <div class="mt-10 rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center text-gray-500">
-        No public notes found.
-      </div>
-    } @else {
-      <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        @for (note of filteredNotes; track note.id) {
-          <app-note-card [note]="note" />
-        }
-      </div>
-    }
-  </main>
-</div>
+    <div class="min-w-0">
+      <header class="border-b border-white/10 pb-8">
+        <p class="eyebrow">Docs</p>
+        <h1 class="mt-4 text-3xl font-semibold tracking-[-0.045em] text-mist-50 sm:text-5xl">
+          Documentation
+        </h1>
+        <p class="mt-4 max-w-2xl text-sm leading-7 text-mist-300 sm:text-base">
+          Published guides across every category, with structured explanations, code, and practical walkthroughs.
+        </p>
+
+        <div class="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <label class="relative flex-1">
+            <svg viewBox="0 0 24 24" class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-mist-500" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="m16 16 4 4" stroke-linecap="round" />
+            </svg>
+            <input
+              [(ngModel)]="query"
+              type="search"
+              placeholder="Search docs"
+              class="field w-full pl-11"
+              aria-label="Search docs"
+            />
+          </label>
+
+          @if (category) {
+            <button type="button" class="badge w-fit" (click)="clearFilters()" title="Clear filters">
+              {{ category }} ×
+            </button>
+          }
+
+          <span class="text-xs text-mist-500">
+            {{ filteredNotes.length }} {{ filteredNotes.length === 1 ? 'doc' : 'docs' }}
+          </span>
+        </div>
+      </header>
+
+      @if (loading) {
+        <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+            <div class="skeleton h-64 rounded-3xl"></div>
+          }
+        </div>
+      } @else if (error) {
+        <div class="mt-8">
+          <app-empty-state title="Could not load docs" [message]="error">
+            <button type="button" class="btn-ghost text-xs" (click)="load()">Try again</button>
+          </app-empty-state>
+        </div>
+      } @else if (filteredNotes.length === 0) {
+        <div class="mt-8">
+          <app-empty-state
+            title="No matching docs"
+            [message]="hasFilters ? 'No docs match these filters yet.' : 'Docs will appear here as they are published.'"
+          >
+            @if (hasFilters) {
+              <button type="button" class="btn-ghost text-xs" (click)="clearFilters()">Clear filters</button>
+            }
+          </app-empty-state>
+        </div>
+      } @else {
+        <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          @for (note of filteredNotes; track note.id) {
+            <app-note-card [note]="note" />
+          }
+        </div>
+      }
+    </div>
+  </div>
+</main>
+
+<app-footer />

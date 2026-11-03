@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  align-self: stretch;
+}
+
+.docs-nav-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.14) transparent;
+}
+
+.docs-nav-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.docs-nav-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.14);
+}
+
+.docs-tree-link.is-active {
+  border-left-color: rgb(163 230 53 / 0.75);
+  border-radius: 0 0.5rem 0.5rem 0;
+  background: rgb(163 230 53 / 0.1);
+  color: rgb(190 242 100);
+}

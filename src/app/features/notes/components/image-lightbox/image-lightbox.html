@@ -1,0 +1,35 @@
+<dialog
+  #dialog
+  class="image-lightbox"
+  aria-label="Image preview"
+  (cancel)="close()"
+  (click)="onBackdrop($event)"
+>
+  <div class="image-lightbox__panel">
+    <header class="image-lightbox__bar">
+      <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-acid-300">Image preview</p>
+      <button
+        #closeButton
+        type="button"
+        class="image-lightbox__close"
+        aria-label="Close image preview"
+        (click)="close()"
+      >
+        Close
+      </button>
+    </header>
+
+    <div class="image-lightbox__stage">
+      <img
+        class="image-lightbox__image"
+        [src]="image.url"
+        [alt]="image.alt || 'Note image'"
+        decoding="async"
+      />
+    </div>
+
+    @if (image.caption) {
+      <p class="image-lightbox__caption">{{ image.caption }}</p>
+    }
+  </div>
+</dialog>

@@ -8,6 +8,8 @@ import { NoteSectionModel } from '../../models/note-section.model';
 import { NoteStatus } from '../../models/note-status.model';
 import { NoteApiService } from '../../services/note-api.service';
 import { NoteMapperService } from '../../services/note-mapper.service';
+import { CategoryApiService } from '../../../categories/services/category-api.service';
+import { CategoryResponse } from '../../../categories/models/category.model';
 
 @Component({
   selector: 'app-note-edit',
@@ -19,8 +21,9 @@ export class NoteEdit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly api = inject(NoteApiService);
+  private readonly categoryApi = inject(CategoryApiService);
   private readonly mapper = inject(NoteMapperService);
-  private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
+  readonly id = this.route.snapshot.paramMap.get('id') ?? '';
 
   readonly statuses = [
     { value: NoteStatus.Draft, label: 'Draft' },
@@ -34,8 +37,12 @@ export class NoteEdit {
     status: NoteStatus.Draft,
     folderId: null,
     categoryId: null,
+    tags: [],
     sections: []
   };
+
+  categories: CategoryResponse[] = [];
+  tagsInput = '';
 
   activeSectionId: number | null = null;
   loading = true;
@@ -43,6 +50,8 @@ export class NoteEdit {
   error = '';
 
   ngOnInit(): void {
+    this.loadCategories();
+
     if (!this.id) {
       this.error = 'Note ID is missing.';
       this.loading = false;
@@ -52,6 +61,7 @@ export class NoteEdit {
     this.api.getById(this.id).subscribe({
       next: note => {
         this.note = this.mapper.fromResponse(note);
+        this.tagsInput = (note.tags ?? []).join(', ');
         this.activeSectionId = this.note.sections[0]?.id ?? null;
         this.loading = false;
       },
@@ -62,10 +72,23 @@ export class NoteEdit {
     });
   }
 
+  get categoryGroups(): CategoryResponse[] {
+    return this.categories.filter(category => !category.parentCategoryId);
+  }
+
+  childrenOf(groupId: string): CategoryResponse[] {
+    return this.categories.filter(category => category.parentCategoryId === groupId);
+  }
+
   get activeSection(): NoteSectionModel | null {
     return this.activeSectionId === null
       ? null
       : this.find(this.note.sections, this.activeSectionId);
+  }
+
+  blockCount(): number {
+    return this.flattenSections(this.note.sections)
+      .reduce((total, item) => total + item.section.contents.length, 0);
   }
 
   flattenSections(
@@ -139,6 +162,7 @@ export class NoteEdit {
     }
 
     this.normalize(this.note.sections);
+    this.note.tags = this.parseTags(this.tagsInput);
     this.saving = true;
     this.api.update(this.id, this.note).subscribe({
       next: response => this.router.navigate(['/notes', response.id]),
@@ -160,6 +184,29 @@ export class NoteEdit {
         this.error = err?.error?.detail || 'Unable to delete note.';
       }
     });
+  }
+
+  private loadCategories(): void {
+    this.categoryApi.list().subscribe({
+      next: categories => this.categories = categories,
+      error: () => this.categories = []
+    });
+  }
+
+  private parseTags(value: string): string[] {
+    const seen = new Set<string>();
+    const tags: string[] = [];
+
+    for (const item of value.split(',')) {
+      const tag = item.trim();
+      const key = tag.toLowerCase();
+      if (tag && !seen.has(key)) {
+        seen.add(key);
+        tags.push(tag);
+      }
+    }
+
+    return tags;
   }
 
   private find(sections: NoteSectionModel[], id: number): NoteSectionModel | null {

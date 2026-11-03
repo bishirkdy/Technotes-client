@@ -1,12 +1,12 @@
-<div class="rounded-xl border border-gray-200 bg-white p-4">
+<div class="rounded-xl border border-white/10 bg-ink-900/60 p-4">
 
   <div class="mb-3 flex items-center justify-between">
     <div>
-      <h4 class="text-sm font-semibold text-gray-800">
+      <h4 class="text-sm font-semibold text-mist-100">
         Text
       </h4>
 
-      <p class="text-xs text-gray-500">
+      <p class="text-xs text-mist-400">
         Add normal text content
       </p>
     </div>
@@ -17,7 +17,7 @@
     [value]="data.content || ''"
     (input)="updateContent($any($event.target).value)"
     placeholder="Write your content here..."
-    class="w-full resize-y rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400"
+    class="w-full resize-y rounded-lg border border-white/10 px-3 py-2 text-sm text-mist-100 outline-none focus:border-acid-400/50"
   ></textarea>
 
 </div>

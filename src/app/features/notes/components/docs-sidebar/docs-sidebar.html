@@ -1,0 +1,170 @@
+<ng-template #sectionTree let-note>
+  <div class="space-y-0.5">
+    @for (item of visibleSections(note); track item.section.id) {
+      <div class="flex items-start gap-1" [style.padding-left.px]="item.level * 12">
+        @if (hasChildren(item)) {
+          <button
+            type="button"
+            (click)="toggleSection(item.section.id)"
+            [attr.aria-expanded]="isSectionExpanded(item.section.id)"
+            [attr.aria-label]="'Toggle ' + item.section.title"
+            class="mt-1.5 grid h-4 w-4 shrink-0 place-items-center rounded text-mist-600 transition hover:text-acid-300"
+          >
+            <svg
+              viewBox="0 0 16 16"
+              class="h-3 w-3 transition-transform"
+              [class.rotate-90]="isSectionExpanded(item.section.id)"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+              <path d="m6 3 5 5-5 5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        } @else {
+          <span class="mt-1.5 h-4 w-4 shrink-0" aria-hidden="true"></span>
+        }
+
+        <a
+          [routerLink]="noteRoute(note)"
+          [fragment]="item.anchor"
+          [attr.data-section-anchor]="item.anchor"
+          [attr.aria-current]="activeAnchor() === item.anchor ? 'location' : null"
+          [class.is-active]="activeAnchor() === item.anchor"
+          class="docs-tree-link min-w-0 flex-1 border-l border-white/[0.06] py-1.5 pr-2 text-[11px] leading-4 text-mist-500 transition hover:border-acid-400/40 hover:text-mist-200"
+        >
+          {{ item.section.title }}
+        </a>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #navigation>
+  @if (singleNote) {
+    <div class="space-y-4">
+      <div class="border-b border-white/10 pb-3">
+        <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-acid-300">
+          {{ focusCategory }}
+        </p>
+        <p class="mt-1 text-[11px] text-mist-500">On this page</p>
+      </div>
+
+      @if (focusNote && noteSections(focusNote).length > 0) {
+        <nav
+          class="docs-nav-scroll max-h-[calc(100vh-15rem)] overflow-y-auto pr-1"
+          aria-label="On this page"
+        >
+          <ng-container
+            [ngTemplateOutlet]="sectionTree"
+            [ngTemplateOutletContext]="{ $implicit: focusNote }"
+          />
+        </nav>
+      } @else {
+        <p class="px-1 py-4 text-xs leading-6 text-mist-500">This note has no sections yet.</p>
+      }
+    </div>
+  } @else {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between gap-3">
+        <a routerLink="/notes" class="text-sm font-semibold text-mist-100 transition hover:text-acid-300">
+          Documentation
+        </a>
+        <span class="text-[10px] tabular-nums text-mist-500">{{ notes.length }}</span>
+      </div>
+
+      <label class="relative block">
+        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-mist-500">
+          <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m16 16 4 4" stroke-linecap="round" />
+          </svg>
+        </span>
+        <input
+          type="search"
+          [value]="query()"
+          (input)="setQuery($any($event.target).value)"
+          placeholder="Filter documentation"
+          aria-label="Filter documentation"
+          class="field w-full py-2 pl-8 text-xs"
+        />
+      </label>
+
+      @if (groups.length === 0) {
+        <p class="px-1 py-4 text-xs leading-6 text-mist-500">No documentation matches this filter.</p>
+      } @else {
+        <nav class="docs-nav-scroll max-h-[calc(100vh-15rem)] space-y-1 overflow-y-auto pr-1" aria-label="Documentation">
+          @for (group of groups; track group.name) {
+            <section>
+              <button
+                type="button"
+                (click)="toggle(group.name)"
+                [attr.aria-expanded]="isExpanded(group.name)"
+                class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-mist-400 transition hover:bg-white/[0.04] hover:text-mist-100"
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  class="h-3 w-3 shrink-0 transition-transform"
+                  [class.rotate-90]="isExpanded(group.name)"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  aria-hidden="true"
+                >
+                  <path d="m6 3 5 5-5 5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="min-w-0 flex-1 truncate">{{ group.name }}</span>
+                <span class="text-[10px] font-normal tabular-nums text-mist-600">{{ group.notes.length }}</span>
+              </button>
+
+              @if (isExpanded(group.name)) {
+                <div class="mb-2 ml-4 space-y-0.5 border-l border-white/10 pl-2">
+                  @for (note of group.notes; track note.id) {
+                    <a
+                      [routerLink]="noteRoute(note)"
+                      routerLinkActive="bg-acid-400/10 text-acid-200"
+                      class="block rounded-lg px-3 py-2 text-[13px] font-medium leading-5 text-mist-300 transition hover:bg-white/[0.04] hover:text-mist-100"
+                      [class.text-acid-200]="note.id === currentNoteId"
+                      [class.bg-acid-400/10]="note.id === currentNoteId"
+                    >
+                      <span class="block">{{ note.title }}</span>
+                      @if (categoryLabel(note) !== group.name) {
+                        <span class="mt-0.5 block text-[10px] font-normal uppercase tracking-[0.12em] text-mist-600">
+                          {{ categoryLabel(note) }}
+                        </span>
+                      }
+                    </a>
+
+                    <ng-container
+                      [ngTemplateOutlet]="sectionTree"
+                      [ngTemplateOutletContext]="{ $implicit: note }"
+                    />
+                  }
+                </div>
+              }
+            </section>
+          }
+        </nav>
+      }
+    </div>
+  }
+</ng-template>
+
+<details class="glass-panel rounded-2xl p-4 lg:hidden">
+  <summary class="cursor-pointer list-none text-sm font-semibold text-mist-100">
+    <span class="flex items-center justify-between gap-3">
+      <span>{{ singleNote ? 'On this page' : 'Browse documentation' }}</span>
+      <span class="text-xs font-normal text-mist-500">{{ focusCategory || currentCategory }}</span>
+    </span>
+  </summary>
+  <div class="mt-4 border-t border-white/10 pt-4">
+    <ng-container [ngTemplateOutlet]="navigation" />
+  </div>
+</details>
+
+<aside class="hidden h-full lg:block">
+  <div class="sticky top-24 max-h-[calc(100vh-7rem)] overflow-hidden rounded-2xl border border-white/10 bg-ink-950/55 p-4 backdrop-blur">
+    <ng-container [ngTemplateOutlet]="navigation" />
+  </div>
+</aside>

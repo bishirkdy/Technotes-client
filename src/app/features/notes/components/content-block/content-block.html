@@ -1,7 +1,7 @@
 <div class="space-y-4">
   <div>
-    <h3 class="text-sm font-semibold text-gray-800">Content</h3>
-    <p class="text-xs text-gray-500">Add and organize your note content</p>
+    <h3 class="text-sm font-semibold text-mist-100">Content</h3>
+    <p class="text-xs text-mist-400">Add and organize your note content</p>
   </div>
 
   <div class="space-y-4">
@@ -14,22 +14,23 @@
           @case ('example') { <app-example-block [data]="block.data" (dataChange)="updateBlock(block, $event)" /> }
           @case ('code') { <app-code-block [data]="block.data" (dataChange)="updateBlock(block, $event)" /> }
           @case ('table') { <app-table-block [data]="block.data" (dataChange)="updateBlock(block, $event)" /> }
+          @case ('image') { <app-image-block [data]="block.data" (dataChange)="updateBlock(block, $event)" /> }
           @case ('graph') { <app-graph-block [data]="block.data" (dataChange)="updateBlock(block, $event)" /> }
           @case ('quote') { <app-quote-block [data]="block.data" (dataChange)="updateBlock(block, $event)" /> }
         }
         <div class="mt-2 flex justify-end gap-1">
-          <button type="button" (click)="moveUp(i)" [disabled]="i === 0" class="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-500 disabled:opacity-30">↑ Move up</button>
-          <button type="button" (click)="moveDown(i)" [disabled]="i === blocks.length - 1" class="rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-500 disabled:opacity-30">↓ Move down</button>
-          <button type="button" (click)="removeBlock(block.id)" class="rounded-md border border-gray-200 px-2 py-1 text-xs text-red-500">Delete</button>
+          <button type="button" (click)="moveUp(i)" [disabled]="i === 0" class="rounded-md border border-white/10 px-2 py-1 text-xs text-mist-400 disabled:opacity-30">↑ Move up</button>
+          <button type="button" (click)="moveDown(i)" [disabled]="i === blocks.length - 1" class="rounded-md border border-white/10 px-2 py-1 text-xs text-mist-400 disabled:opacity-30">↓ Move down</button>
+          <button type="button" (click)="removeBlock(block.id)" class="rounded-md border border-white/10 px-2 py-1 text-xs text-rose-400">Delete</button>
         </div>
       </div>
     }
   </div>
 
   @if (blocks.length === 0) {
-    <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center">
-      <p class="text-sm font-medium text-gray-600">No content blocks</p>
-      <p class="mt-1 text-xs text-gray-400">Add a block to start writing your note.</p>
+    <div class="rounded-xl border border-dashed border-white/15 bg-white/[0.04] px-6 py-10 text-center">
+      <p class="text-sm font-medium text-mist-300">No content blocks</p>
+      <p class="mt-1 text-xs text-mist-500">Add a block to start writing your note.</p>
     </div>
   }
 

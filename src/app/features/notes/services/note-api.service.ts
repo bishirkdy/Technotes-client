@@ -26,6 +26,10 @@ export class NoteApiService {
     return this.http.get<NoteResponse[]>(`${this.baseUrl}/my`);
   }
 
+  getSharedNotes(): Observable<NoteResponse[]> {
+    return this.http.get<NoteResponse[]>(`${this.baseUrl}/shared`);
+  }
+
   create(note: NoteCreateModel): Observable<NoteResponse> {
     return this.http.post<NoteResponse>(this.baseUrl, this.mapper.toCreateRequest(note));
   }
@@ -42,5 +46,9 @@ export class NoteApiService {
   search(searchTerm: string): Observable<NoteResponse[]> {
     const params = new HttpParams().set('searchTerm', searchTerm.trim());
     return this.http.get<NoteResponse[]>(`${this.baseUrl}/search`, { params });
+  }
+
+  saveReadingProgress(id: string, percent: number): Observable<{ percent: number }> {
+    return this.http.put<{ percent: number }>(`${this.baseUrl}/${id}/progress`, { percent });
   }
 }

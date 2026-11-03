@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { SQL_DIALECTS } from '../../../models/code-example.model';
 
 @Component({
   selector: 'app-code-block',
@@ -7,6 +8,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './code-block.css'
 })
 export class CodeBlock {
+
+  readonly sqlDialects = SQL_DIALECTS;
 
   @Input()
   data: any = {};
@@ -18,6 +21,16 @@ export class CodeBlock {
     this.data = {
       ...this.data,
       [field]: value
+    };
+
+    this.dataChange.emit(this.data);
+  }
+
+  setLanguage(language: string): void {
+    this.data = {
+      ...this.data,
+      language,
+      ...(language === 'sql' && !this.data.dialect ? { dialect: 'sqlserver' } : {})
     };
 
     this.dataChange.emit(this.data);

@@ -1,0 +1,184 @@
+@for (item of flattenSections(sections); track item.section.id) {
+  <section
+    class="docs-section scroll-mt-28"
+    [id]="item.anchor"
+    [class.docs-section--nested]="item.level > 0"
+  >
+    @if (item.level === 0) {
+      <h2 class="docs-section__heading">{{ item.section.title }}</h2>
+    } @else if (item.level === 1) {
+      <h3 class="docs-section__subheading">{{ item.section.title }}</h3>
+    } @else {
+      <h4 class="docs-section__minor-heading">{{ item.section.title }}</h4>
+    }
+
+    <div class="docs-section__content">
+      @for (content of item.section.contents; track content.id) {
+        @switch (typeOf(content)) {
+          @case ('text') {
+            <p class="note-prose whitespace-pre-wrap">{{ content.content || dataOf(content).content }}</p>
+          }
+
+          @case ('definition') {
+            <div class="docs-callout">
+              <p class="text-sm font-semibold text-acid-300">{{ dataOf(content).term }}</p>
+              <p class="mt-1.5 text-sm leading-7 text-mist-200">
+                {{ dataOf(content).definition || content.content }}
+              </p>
+              @if (dataOf(content).example) {
+                <p class="mt-2 text-sm text-mist-400">Example: {{ dataOf(content).example }}</p>
+              }
+            </div>
+          }
+
+          @case ('points') {
+            <ul class="docs-list">
+              @for (point of dataOf(content).points ?? []; track $index) {
+                <li>{{ point }}</li>
+              }
+            </ul>
+          }
+
+          @case ('code') {
+            <app-code-example
+              [code]="codeOf(content)"
+              [language]="languageOf(content)"
+              [dialect]="dialectOf(content)"
+              [filename]="filenameOf(content)"
+              [expectedOutput]="expectedOutputOf(content)"
+              [runnable]="runnableOf(content)"
+              [showLineNumbers]="showLineNumbers(content)"
+              [wrapCode]="wrapCode(content)"
+              (runRequested)="openExample($event)"
+            />
+          }
+
+          @case ('example') {
+            @if (dataOf(content).title || dataOf(content).description || content.content || codeOf(content)) {
+              <div class="docs-example">
+                @if (dataOf(content).title) {
+                  <h3 class="text-lg font-semibold text-mist-50">{{ dataOf(content).title }}</h3>
+                }
+                @if (dataOf(content).description || content.content) {
+                  <p class="mt-1.5 text-sm leading-7 text-mist-300">
+                    {{ dataOf(content).description || content.content }}
+                  </p>
+                }
+                @if (codeOf(content)) {
+                  <div class="mt-4">
+                    <app-code-example
+                      [code]="codeOf(content)"
+                      [language]="languageOf(content)"
+                      [dialect]="dialectOf(content)"
+                      [filename]="filenameOf(content)"
+                      [expectedOutput]="expectedOutputOf(content)"
+                      [runnable]="runnableOf(content)"
+                      [showLineNumbers]="showLineNumbers(content)"
+                      [wrapCode]="wrapCode(content)"
+                      (runRequested)="openExample($event)"
+                    />
+                  </div>
+                }
+              </div>
+            }
+          }
+
+          @case ('table') {
+            <div class="overflow-x-auto">
+              @if (dataOf(content).title) {
+                <h3 class="mb-3 text-base font-semibold text-mist-50">{{ dataOf(content).title }}</h3>
+              }
+              <table class="docs-table">
+                <thead>
+                  <tr>
+                    @for (column of dataOf(content).columns ?? []; track column) {
+                      <th>{{ column }}</th>
+                    }
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of dataOf(content).rows ?? []; track $index) {
+                    <tr>
+                      @for (cell of row; track $index) {
+                        <td>{{ cell }}</td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          @case ('image') {
+            @if (dataOf(content).url) {
+              <figure class="note-image overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                <button
+                  type="button"
+                  class="note-image__trigger"
+                  [attr.aria-label]="'Open image: ' + (dataOf(content).alt || 'Note image')"
+                  (click)="openImage(content)"
+                >
+                  <img
+                    [src]="dataOf(content).url"
+                    [alt]="dataOf(content).alt || 'Note image'"
+                    class="note-image__image"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="note-image__hint" aria-hidden="true">Click to enlarge</span>
+                </button>
+                @if (dataOf(content).caption) {
+                  <figcaption class="border-t border-white/10 px-4 py-3 text-xs text-mist-400">
+                    {{ dataOf(content).caption }}
+                  </figcaption>
+                }
+              </figure>
+            }
+          }
+
+          @case ('quote') {
+            <blockquote class="docs-quote">
+              “{{ dataOf(content).quote || content.content }}”
+              @if (dataOf(content).author) {
+                <footer class="mt-2 text-xs not-italic text-mist-400">— {{ dataOf(content).author }}</footer>
+              }
+            </blockquote>
+          }
+
+          @case ('graph') {
+            <div class="docs-example">
+              <h3 class="text-base font-semibold text-mist-50">{{ dataOf(content).title || 'Graph' }}</h3>
+              <div class="mt-4 space-y-3">
+                @for (row of dataOf(content).rows ?? []; track $index) {
+                  <div class="flex items-center gap-3">
+                    <span class="w-28 shrink-0 text-xs text-mist-300">{{ row.label }}</span>
+                    <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-white/10">
+                      <div class="h-full rounded-full bg-gradient-to-r from-acid-400 to-cyan-300" [style.width.%]="graphWidth(row.value)"></div>
+                    </div>
+                    <span class="w-10 text-right text-xs text-mist-400">{{ row.value }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @default {
+            <div class="docs-callout text-sm text-mist-300">{{ content.content }}</div>
+          }
+        }
+      }
+    </div>
+  </section>
+}
+
+@if (playground()) {
+  <app-code-playground [example]="playground()!" (closed)="closePlayground()" />
+}
+
+@if (runner()) {
+  <app-execution-runner [example]="runner()!" (closed)="closeRunner()" />
+}
+
+@if (lightboxImage()) {
+  <app-image-lightbox [image]="lightboxImage()!" (closed)="closeImage()" />
+}

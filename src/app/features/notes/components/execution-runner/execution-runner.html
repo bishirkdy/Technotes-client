@@ -1,0 +1,115 @@
+<dialog
+  #dialog
+  class="runner"
+  (cancel)="close()"
+  (click)="onBackdrop($event)"
+  aria-label="Run this example"
+>
+  <div class="runner__panel">
+    <header class="runner__header">
+      <div class="min-w-0">
+        <p class="runner__eyebrow">Run this example</p>
+        <h2 class="runner__title">{{ example.filename || languageLabel }}</h2>
+        <p class="runner__meta">
+          {{ languageLabel }}
+          @if (result()?.version) {
+            <span>· {{ result()?.version }}</span>
+          }
+        </p>
+      </div>
+
+      <div class="runner__actions">
+        <button
+          type="button"
+          class="runner__button runner__button--primary"
+          [disabled]="running()"
+          (click)="run()"
+        >
+          {{ running() ? 'Running…' : 'Run' }}
+        </button>
+        <button type="button" class="runner__button" (click)="reset()">Reset</button>
+        <button type="button" class="runner__button" (click)="copyCode()">
+          {{ copied() ? 'Copied' : 'Copy' }}
+        </button>
+        <button type="button" class="runner__button runner__button--close" (click)="close()" aria-label="Close">
+          Esc
+        </button>
+      </div>
+    </header>
+
+    <div class="runner__body">
+      <section class="runner__editor-panel">
+        <div class="runner__section-head">
+          <span>Code</span>
+          <span class="runner__hint">Ctrl + Enter to run</span>
+        </div>
+        <textarea
+          class="runner__editor"
+          spellcheck="false"
+          aria-label="Code editor"
+          [value]="code()"
+          (input)="code.set($any($event.target).value)"
+          (keydown.control.enter)="run()"
+          (keydown.meta.enter)="run()"
+        ></textarea>
+      </section>
+
+      <section class="runner__output-panel">
+        <div class="runner__section-head">
+          <span>Result</span>
+          <span class="runner__status" [class.runner__status--error]="result() && !result()!.success">
+            <span class="runner__dot"></span>
+            {{ statusLabel }}
+          </span>
+        </div>
+
+        <div class="runner__output">
+          @if (running()) {
+            <p class="runner__muted">Starting a sandbox and running your code…</p>
+          } @else if (result(); as current) {
+            @if (current.output) {
+              <pre class="runner__stdout">{{ current.output }}</pre>
+            }
+
+            @if (current.error) {
+              <pre class="runner__error">{{ current.error }}</pre>
+            }
+
+            @if (current.diagnostics.length > 0) {
+              <ul class="runner__diagnostics">
+                @for (diagnostic of current.diagnostics; track $index) {
+                  <li>
+                    <span class="runner__diagnostic-id">{{ diagnostic.id }}</span>
+                    <span>{{ diagnostic.message }}</span>
+                    <span class="runner__diagnostic-line">line {{ diagnostic.line }}</span>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (!current.output && !current.error && current.success) {
+              <p class="runner__muted">Finished without output.</p>
+            }
+
+            @if (matchesExpected !== null) {
+              <p class="runner__match" [class.runner__match--bad]="matchesExpected === false">
+                {{ matchesExpected ? 'Output matches the expected result.' : 'Output differs from the expected result.' }}
+              </p>
+            }
+
+            <p class="runner__duration">{{ current.durationMs }} ms</p>
+          } @else {
+            <p class="runner__muted">Run the example to see its output.</p>
+          }
+        </div>
+
+        @if (example.expectedOutput) {
+          <div class="runner__expected">
+            <span class="runner__expected-label">Expected output</span>
+            <pre class="runner__expected-value">{{ example.expectedOutput }}</pre>
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+</dialog>

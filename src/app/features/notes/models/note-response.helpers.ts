@@ -22,10 +22,13 @@ export function noteTextPreview(note: NoteResponse): string {
   return visit(note.sections);
 }
 
-export function noteSectionCount(note: NoteResponse): number {
-  return (note.sections ?? []).reduce(
-    (total: number, section: NoteSectionResponse) =>
-      total + 1 + (section.children?.length ?? 0),
+function countSections(sections: NoteSectionResponse[]): number {
+  return sections.reduce(
+    (total, section) => total + 1 + countSections(section.children ?? []),
     0
   );
+}
+
+export function noteSectionCount(note: NoteResponse): number {
+  return countSections(note.sections ?? []);
 }

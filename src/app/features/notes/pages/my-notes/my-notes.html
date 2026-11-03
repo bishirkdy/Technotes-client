@@ -1,47 +1,78 @@
 <div class="space-y-6">
-  <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">My Notes</h1>
-      <p class="mt-1 text-sm text-gray-500">Manage your personal knowledge base.</p>
-    </div>
-    <a routerLink="/app/notes/create" class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white">
-      + New note
-    </a>
-  </div>
+  <app-page-header
+    eyebrow="Library"
+    title="My notes"
+    description="Manage every note in your personal knowledge base."
+  >
+    <a routerLink="/app/notes/create" class="btn-primary text-xs">+ New note</a>
+  </app-page-header>
 
   @if (loading) {
-    <p class="text-gray-500">Loading your notes...</p>
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+        <div class="skeleton h-64 rounded-3xl"></div>
+      }
+    </div>
   } @else if (error && notes.length === 0) {
-    <p class="text-red-600">{{ error }}</p>
+    <app-empty-state title="Could not load notes" [message]="error">
+      <button type="button" class="btn-ghost text-xs" (click)="load()">Try again</button>
+    </app-empty-state>
   } @else {
     <div class="flex flex-wrap gap-2">
       @for (item of filters; track item) {
         <button
+          type="button"
           (click)="filter = item"
-          class="rounded-full px-4 py-2 text-sm font-medium"
-          [class.bg-gray-900]="filter === item"
-          [class.text-white]="filter === item"
-          [class.bg-gray-100]="filter !== item"
+          class="rounded-full border px-4 py-2 text-xs font-semibold transition"
+          [class.border-acid-400/30]="filter === item"
+          [class.bg-acid-400/10]="filter === item"
+          [class.text-acid-300]="filter === item"
+          [class.border-white/10]="filter !== item"
+          [class.text-mist-400]="filter !== item"
+          [class.hover:text-mist-100]="filter !== item"
         >
           {{ item }}
         </button>
       }
     </div>
 
+    @if (category || tag) {
+      <div class="flex flex-wrap gap-2">
+        @if (category) {
+          <button type="button" class="badge w-fit" (click)="clearCategory()">
+            {{ category }} ×
+          </button>
+        }
+        @if (tag) {
+          <button type="button" class="badge-neutral w-fit" (click)="clearTag()">
+            #{{ tag }} ×
+          </button>
+        }
+      </div>
+    }
+
     @if (error) {
-      <p class="text-sm text-red-600">{{ error }}</p>
+      <p class="text-sm text-rose-300">{{ error }}</p>
     }
 
     @if (filteredNotes.length === 0) {
-      <div class="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center text-gray-500">
-        {{ notes.length === 0 ? 'You have not created any notes yet.' : 'No notes match this filter.' }}
-      </div>
+      <app-empty-state
+        [title]="notes.length === 0 ? 'Your library is empty' : 'No notes match this filter'"
+        [message]="notes.length === 0 ? 'Create a structured note to get started.' : 'Try another filter to see your notes.'"
+      >
+        @if (notes.length === 0) {
+          <a routerLink="/app/notes/create" class="btn-primary text-xs">Create a note</a>
+        } @else {
+          <button type="button" class="btn-ghost text-xs" (click)="filter = 'All'">Show all notes</button>
+        }
+      </app-empty-state>
     } @else {
       <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         @for (note of filteredNotes; track note.id) {
           <app-note-card
             [note]="note"
             [editable]="true"
+            [showVisibility]="true"
             [deleting]="deletingId === note.id"
             (deleteRequested)="delete($event)"
           />

@@ -5,5 +5,6 @@ export type ContentBlockType =
   | 'example'
   | 'code'
   | 'table'
+  | 'image'
   | 'graph'
   | 'quote';

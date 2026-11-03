@@ -1,0 +1,99 @@
+.playground {
+  width: min(74rem, calc(100vw - 1.5rem));
+  max-width: 74rem;
+  max-height: calc(100vh - 1.5rem);
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 1rem;
+  background: rgb(9 12 20 / 0.98);
+  color: rgb(226 232 240);
+  box-shadow: 0 30px 90px rgb(0 0 0 / 0.65);
+}
+
+.playground::backdrop {
+  background: rgb(2 4 9 / 0.82);
+  backdrop-filter: blur(5px);
+}
+
+.playground__panel {
+  display: flex;
+  max-height: calc(100vh - 1.5rem);
+  min-height: min(44rem, calc(100vh - 1.5rem));
+  flex-direction: column;
+}
+
+.playground__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  padding: 0.85rem 1rem;
+}
+
+.playground__button {
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  color: rgb(168 178 196);
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.playground__button:hover {
+  border-color: rgb(255 255 255 / 0.24);
+  background: rgb(255 255 255 / 0.06);
+  color: rgb(241 245 249);
+}
+
+.playground__button--primary {
+  border-color: rgb(163 230 53 / 0.4);
+  background: rgb(163 230 53 / 0.14);
+  color: rgb(190 242 100);
+}
+
+.playground__button--close {
+  width: 2.4rem;
+  padding-inline: 0;
+  text-align: center;
+}
+
+.playground__editor {
+  height: 100%;
+  min-height: 240px;
+  width: 100%;
+  resize: none;
+  border: 1px solid rgb(255 255 255 / 0.09);
+  border-radius: 0.65rem;
+  background: rgb(4 7 13 / 0.85);
+  padding: 0.8rem;
+  color: rgb(203 213 225);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.7;
+  outline: none;
+  tab-size: 2;
+}
+
+.playground__editor:focus {
+  border-color: rgb(163 230 53 / 0.4);
+  box-shadow: 0 0 0 1px rgb(163 230 53 / 0.2);
+}
+
+@media (max-width: 1023px) {
+  .playground {
+    width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
+  }
+
+  .playground__panel {
+    max-height: calc(100vh - 1rem);
+    min-height: calc(100vh - 1rem);
+  }
+
+  .playground__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

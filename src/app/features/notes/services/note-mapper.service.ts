@@ -31,6 +31,7 @@ export class NoteMapperService {
       status: note.status,
       folderId: note.folderId,
       categoryId: note.categoryId,
+      tags: [...(note.tags ?? [])],
       sections: (note.sections ?? []).map((section, index) => this.fromSection(section, index))
     };
   }
@@ -42,6 +43,7 @@ export class NoteMapperService {
       status: note.status,
       folderId: note.folderId,
       categoryId: note.categoryId,
+      tags: note.tags,
       sections: note.sections.map((section, index) => this.toSectionRequest(section, index))
     };
   }

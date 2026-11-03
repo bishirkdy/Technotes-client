@@ -11,6 +11,7 @@ describe('NoteMapperService', () => {
     status: 2,
     folderId: null,
     categoryId: null,
+    tags: [],
     sections: [
       {
         id: 1,
@@ -26,9 +27,16 @@ describe('NoteMapperService', () => {
           },
           {
             id: 11,
-            type: 'points',
+            type: 'image',
             sortOrder: 1,
-            data: { points: ['Use AsNoTracking for reads.'] }
+            data: {
+              url: 'https://res.cloudinary.com/demo/diagram.png',
+              publicId: 'technotes/diagram',
+              width: 1200,
+              height: 800,
+              alt: 'Query flow',
+              caption: 'How the query is executed'
+            }
           }
         ]
       }
@@ -49,7 +57,20 @@ describe('NoteMapperService', () => {
       data: JSON.stringify({ code: 'var notes = await db.Notes.ToListAsync();' }),
       metadata: JSON.stringify({ language: 'csharp', filename: 'Program.cs' })
     });
-    expect(request.sections[0].contents[1].type).toBe(3);
+    expect(request.sections[0].contents[1]).toEqual({
+      type: 8,
+      sortOrder: 2,
+      content: null,
+      data: JSON.stringify({
+        url: 'https://res.cloudinary.com/demo/diagram.png',
+        publicId: 'technotes/diagram',
+        width: 1200,
+        height: 800,
+        alt: 'Query flow',
+        caption: 'How the query is executed'
+      }),
+      metadata: null
+    });
   });
 
   it('restores editor content from an API response', () => {
