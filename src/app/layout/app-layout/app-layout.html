@@ -1,13 +1,17 @@
-<div class="min-h-screen bg-gray-50">
+@if (menuOpen()) {
+  <button
+    type="button"
+    class="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm lg:hidden"
+    (click)="menuOpen.set(false)"
+    aria-label="Close navigation overlay"
+  ></button>
+}
 
-  <app-sidebar/>
+<app-sidebar [open]="menuOpen()" (closed)="menuOpen.set(false)" />
 
-  <main class="ml-64">
-    <app-header />
-
-    <div class="p-6">
-      <router-outlet />
-    </div>
+<div class="min-h-screen lg:pl-72">
+  <app-header (menuToggled)="menuOpen.set(true)" />
+  <main class="px-4 py-8 sm:px-6 lg:px-8">
+    <router-outlet />
   </main>
-
 </div>

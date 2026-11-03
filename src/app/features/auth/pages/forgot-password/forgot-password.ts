@@ -1,4 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-@Component({ selector:'app-forgot-password', imports:[RouterLink], templateUrl:'./forgot-password.html', styleUrl:'./forgot-password.css' })
+import { AuthShell } from '../../../../shared/components/auth-shell/auth-shell';
+
+@Component({
+  selector: 'app-forgot-password',
+  imports: [RouterLink, AuthShell],
+  templateUrl: './forgot-password.html',
+  styleUrl: './forgot-password.css'
+})
 export class ForgotPassword {}

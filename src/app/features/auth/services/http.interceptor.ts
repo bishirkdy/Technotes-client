@@ -9,11 +9,15 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
   const authBase = `${environment.apiUrl}/auth`;
-  const isAuthEndpoint = req.url.startsWith(authBase);
-  const isRefresh = req.url === `${authBase}/refresh`;
+  const anonymousAuthEndpoints = new Set([
+    `${authBase}/login`,
+    `${authBase}/register`,
+    `${authBase}/refresh`
+  ]);
+  const isAnonymousAuth = anonymousAuthEndpoints.has(req.url);
   const token = auth.accessToken;
 
-  const request = !isAuthEndpoint && token
+  const request = !isAnonymousAuth && token
     ? req.clone({
         setHeaders: { Authorization: `Bearer ${token}` },
         withCredentials: true
@@ -22,7 +26,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(request).pipe(
     catchError((error: unknown) => {
-      if (!(error instanceof HttpErrorResponse) || error.status !== 401 || isAuthEndpoint || isRefresh || !token) {
+      if (!(error instanceof HttpErrorResponse) || error.status !== 401 || isAnonymousAuth || !token) {
         return throwError(() => error);
       }
 

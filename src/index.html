@@ -2,10 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Notes</title>
+  <title>Scribly — Read deeply.</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="theme-color" content="#050505">
+  <meta name="description" content="Scribly is a quiet place to read and collect structured notes.">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <script>
+    try {
+      if (localStorage.getItem('scribly_theme') === 'signal') {
+        document.documentElement.classList.add('theme-signal');
+      }
+    } catch {}
+  </script>
 </head>
 <body>
   <app-root></app-root>

@@ -20,7 +20,7 @@ import { Lesson } from './features/learn/pages/lesson/lesson';
 import { Search } from './features/search/pages/search/search';
 import { Activity } from './features/activity/pages/activity/activity';
 import { NoteEdit } from './features/notes/pages/note-edit/note-edit';
-import { authGuard } from './features/auth/auth.guard';
+import { adminGuard, authGuard } from './features/auth/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -41,16 +41,16 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
-      { path: 'notes', component: MyNotes },
-      { path: 'notes/create', component: NoteCreate },
-      { path: 'notes/edit/:id', component: NoteEdit },
+      { path: 'notes', component: MyNotes, canActivate: [adminGuard] },
+      { path: 'notes/create', component: NoteCreate, canActivate: [adminGuard] },
+      { path: 'notes/edit/:id', component: NoteEdit, canActivate: [adminGuard] },
       { path: 'favorites', component: FavoriteList },
-      { path: 'shared', component: SharedNotes },
-      { path: 'categories', component: CategoryList },
-      { path: 'tags', component: TagList },
+      { path: 'shared', component: SharedNotes, canActivate: [adminGuard] },
+      { path: 'categories', component: CategoryList, canActivate: [adminGuard] },
+      { path: 'tags', component: TagList, canActivate: [adminGuard] },
       { path: 'profile', component: Profile },
       { path: 'search', component: Search },
-      { path: 'activity', component: Activity },
+      { path: 'activity', component: Activity, canActivate: [adminGuard] },
     ],
   },
   { path: '**', redirectTo: '' },

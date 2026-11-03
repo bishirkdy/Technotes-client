@@ -30,6 +30,10 @@ export class AuthService {
     return !!this._accessToken;
   }
 
+  get isAdmin(): boolean {
+    return this._user?.roles?.some(role => role.toLowerCase() === 'admin') ?? false;
+  }
+
   login(email: string, password: string): Observable<AuthResponse> {
     const request: LoginRequest = { email, password };
     return this.http

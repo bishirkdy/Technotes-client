@@ -1,19 +1,20 @@
-<footer class="border-t border-gray-200 bg-white">
-  <div class="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-10 sm:flex-row sm:items-center sm:justify-between">
-
-    <div>
-      <p class="font-semibold text-gray-900">
-        TechNotes
-      </p>
-
-      <p class="mt-1 text-sm text-gray-500">
-        Organize your knowledge. Build your understanding.
+<footer class="mt-24 border-t border-white/10">
+  <div class="page-shell flex flex-col gap-8 py-12 sm:flex-row sm:items-end sm:justify-between">
+    <div class="max-w-md">
+      <div class="flex items-center gap-3">
+        <img src="logo.png" alt="" class="h-10 w-auto" />
+        <p class="text-lg font-semibold tracking-[-0.03em] text-mist-50">Scribly</p>
+      </div>
+      <p class="mt-4 text-sm leading-7 text-mist-300">
+        A quiet reading room for notes worth keeping.
       </p>
     </div>
 
-    <p class="text-sm text-gray-400">
-      © 2026 TechNotes
-    </p>
-
+    <div class="flex flex-wrap gap-x-8 gap-y-3 text-sm text-mist-400">
+      <a routerLink="/notes" class="transition hover:text-acid-300">Explore</a>
+      <a routerLink="/learn" class="transition hover:text-acid-300">Reading room</a>
+      <a routerLink="/login" class="transition hover:text-acid-300">Sign in</a>
+      <span>© {{ year }} Scribly</span>
+    </div>
   </div>
 </footer>

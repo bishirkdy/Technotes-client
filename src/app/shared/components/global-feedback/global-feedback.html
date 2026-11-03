@@ -1,0 +1,43 @@
+@if (loading.isLoading()) {
+  <div class="page-loading-bar" role="progressbar" aria-label="Loading"></div>
+}
+
+<div class="toast-stack" aria-live="polite" aria-atomic="false">
+  @for (toast of notifications.notifications(); track toast.id) {
+    <div
+      class="toast"
+      [class.toast-error]="toast.kind === 'error'"
+      [class.toast-success]="toast.kind === 'success'"
+      [class.toast-info]="toast.kind === 'info'"
+      role="status"
+    >
+      <span
+        class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+        [class.bg-rose-400/15]="toast.kind === 'error'"
+        [class.text-rose-200]="toast.kind === 'error'"
+        [class.bg-acid-400/15]="toast.kind === 'success'"
+        [class.text-acid-300]="toast.kind === 'success'"
+        [class.bg-cyan-400/15]="toast.kind === 'info'"
+        [class.text-cyan-300]="toast.kind === 'info'"
+      >
+        {{ toast.kind === 'error' ? '!' : toast.kind === 'success' ? 'OK' : 'i' }}
+      </span>
+
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-semibold text-mist-50">{{ toast.title }}</p>
+        @if (toast.message) {
+          <p class="mt-1 text-xs leading-5 text-mist-300">{{ toast.message }}</p>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="shrink-0 text-lg leading-none text-mist-400 transition hover:text-white"
+        (click)="notifications.dismiss(toast.id)"
+        aria-label="Dismiss notification"
+      >
+        x
+      </button>
+    </div>
+  }
+</div>
