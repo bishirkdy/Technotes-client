@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ContentBlock } from '../../components/content-block/content-block';
@@ -47,7 +47,9 @@ export class NoteEdit {
   activeSectionId: number | null = null;
   loading = true;
   saving = false;
+  dirty = false;
   error = '';
+  private changeVersion = 0;
 
   ngOnInit(): void {
     this.loadCategories();
@@ -64,6 +66,8 @@ export class NoteEdit {
         this.tagsInput = (note.tags ?? []).join(', ');
         this.activeSectionId = this.note.sections[0]?.id ?? null;
         this.loading = false;
+        this.dirty = false;
+        this.changeVersion = 0;
       },
       error: err => {
         this.error = err?.error?.detail || 'Unable to load note.';
@@ -113,6 +117,7 @@ export class NoteEdit {
     const section = this.find(this.note.sections, id);
     if (section) {
       section.contents = blocks;
+      this.touch();
     }
   }
 
@@ -135,6 +140,7 @@ export class NoteEdit {
 
     target.push(section);
     this.activeSectionId = section.id;
+    this.touch();
   }
 
   removeSection(id: number): void {
@@ -142,13 +148,23 @@ export class NoteEdit {
       return;
     }
 
+    this.touch();
     this.normalize(this.note.sections);
     if (this.activeSectionId === id) {
       this.activeSectionId = this.note.sections[0]?.id ?? null;
     }
   }
 
+  touch(): void {
+    this.dirty = true;
+    this.changeVersion++;
+  }
+
   save(): void {
+    if (this.saving) {
+      return;
+    }
+
     this.error = '';
 
     if (!this.note.title.trim()) {
@@ -163,9 +179,20 @@ export class NoteEdit {
 
     this.normalize(this.note.sections);
     this.note.tags = this.parseTags(this.tagsInput);
+    const version = this.changeVersion;
     this.saving = true;
     this.api.update(this.id, this.note).subscribe({
-      next: response => this.router.navigate(['/notes', response.id]),
+      next: response => {
+        this.saving = false;
+
+        if (this.changeVersion !== version) {
+          this.save();
+          return;
+        }
+
+        this.dirty = false;
+        this.router.navigate(['/notes', response.id]);
+      },
       error: err => {
         this.error = err?.error?.detail || 'Unable to update note.';
         this.saving = false;
@@ -184,6 +211,16 @@ export class NoteEdit {
         this.error = err?.error?.detail || 'Unable to delete note.';
       }
     });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (!this.dirty) {
+      return;
+    }
+
+    event.preventDefault();
+    event.returnValue = '';
   }
 
   private loadCategories(): void {
