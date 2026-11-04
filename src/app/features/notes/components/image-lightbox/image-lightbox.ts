@@ -7,6 +7,7 @@ import {
   ViewChild,
   output
 } from '@angular/core';
+import { ImageWatermark } from '../../../../shared/components/image-watermark/image-watermark';
 
 export interface LightboxImage {
   url: string;
@@ -16,6 +17,7 @@ export interface LightboxImage {
 
 @Component({
   selector: 'app-image-lightbox',
+  imports: [ImageWatermark],
   templateUrl: './image-lightbox.html',
   styleUrl: './image-lightbox.css'
 })
