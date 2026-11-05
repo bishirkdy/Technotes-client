@@ -3,7 +3,6 @@ import { CodeExample } from '../code-example/code-example';
 import { CodePlayground } from '../code-playground/code-playground';
 import { ExecutionRunner } from '../execution-runner/execution-runner';
 import { ImageLightbox, LightboxImage } from '../image-lightbox/image-lightbox';
-import { ImageWatermark } from '../../../../shared/components/image-watermark/image-watermark';
 import {
   CodeExampleSource,
   SqlDialect,
@@ -19,7 +18,7 @@ import { FlatNoteSection, flattenNoteSections } from '../../models/note-section.
 
 @Component({
   selector: 'app-note-reader',
-  imports: [CodeExample, CodePlayground, ExecutionRunner, ImageLightbox, ImageWatermark],
+  imports: [CodeExample, CodePlayground, ExecutionRunner, ImageLightbox],
   templateUrl: './note-reader.html',
   styleUrl: './note-reader.css'
 })

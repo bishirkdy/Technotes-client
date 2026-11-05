@@ -49,18 +49,6 @@ describe('NoteReader', () => {
     expect(fixture.nativeElement.textContent).toContain('How the services connect');
   });
 
-  it('renders the Scribly logo watermark over the image', () => {
-    const watermark = fixture.nativeElement.querySelector(
-      '.note-image__trigger app-image-watermark'
-    ) as HTMLElement;
-    const logo = watermark?.querySelector('img') as HTMLImageElement;
-
-    expect(watermark).toBeTruthy();
-    expect(watermark.textContent?.trim()).toBe('');
-    expect(logo.getAttribute('src')).toBe('logo.png');
-    expect(logo.getAttribute('alt')).toBe('');
-  });
-
   it('opens the full image in a lightbox and closes it', () => {
     const trigger = fixture.nativeElement.querySelector('.note-image__trigger') as HTMLButtonElement;
     trigger.click();
@@ -72,7 +60,6 @@ describe('NoteReader', () => {
     expect(lightbox).toBeTruthy();
     expect(dialog).toBeTruthy();
     expect(dialog?.hasAttribute('open')).toBe(true);
-    expect(fixture.nativeElement.querySelector('app-image-lightbox app-image-watermark')).toBeTruthy();
 
     const close = fixture.nativeElement.querySelector(
       'app-image-lightbox button[aria-label="Close image preview"]'
