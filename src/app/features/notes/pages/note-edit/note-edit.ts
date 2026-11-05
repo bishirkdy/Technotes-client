@@ -8,8 +8,10 @@ import { NoteSectionModel } from '../../models/note-section.model';
 import { NoteStatus } from '../../models/note-status.model';
 import { NoteApiService } from '../../services/note-api.service';
 import { NoteMapperService } from '../../services/note-mapper.service';
+import { NoteResponse } from '../../models/note-response.model';
 import { CategoryApiService } from '../../../categories/services/category-api.service';
 import { CategoryResponse } from '../../../categories/models/category.model';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-note-edit',
@@ -23,6 +25,7 @@ export class NoteEdit {
   private readonly api = inject(NoteApiService);
   private readonly categoryApi = inject(CategoryApiService);
   private readonly mapper = inject(NoteMapperService);
+  private readonly notifications = inject(NotificationService);
   readonly id = this.route.snapshot.paramMap.get('id') ?? '';
 
   readonly statuses = [
@@ -190,8 +193,10 @@ export class NoteEdit {
           return;
         }
 
+        this.applySavedResponse(response);
         this.dirty = false;
-        this.router.navigate(['/notes', response.id]);
+        this.changeVersion = 0;
+        this.notifications.success('Note updated.');
       },
       error: err => {
         this.error = err?.error?.detail || 'Unable to update note.';
@@ -221,6 +226,16 @@ export class NoteEdit {
 
     event.preventDefault();
     event.returnValue = '';
+  }
+
+  private applySavedResponse(response: NoteResponse): void {
+    this.note.title = response.title;
+    this.note.visibility = response.visibility;
+    this.note.status = response.status;
+    this.note.folderId = response.folderId;
+    this.note.categoryId = response.categoryId;
+    this.note.tags = [...(response.tags ?? [])];
+    this.tagsInput = this.note.tags.join(', ');
   }
 
   private loadCategories(): void {

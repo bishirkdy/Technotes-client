@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 import { environment } from '../../../../../environments/environment';
 import { NoteCreateModel } from '../../models/note-create.model';
 import { NoteResponse } from '../../models/note-response.model';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { testProviders } from '../../../../testing/test-providers';
 import { NoteEdit } from './note-edit';
 
@@ -14,6 +15,7 @@ describe('NoteEdit', () => {
   let fixture: ComponentFixture<NoteEdit>;
   let httpMock: HttpTestingController;
   let router: Router;
+  let notifications: NotificationService;
 
   const updateUrl = `${environment.apiUrl}/notes/note-1`;
 
@@ -31,7 +33,9 @@ describe('NoteEdit', () => {
 
     httpMock = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router);
+    notifications = TestBed.inject(NotificationService);
     vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    vi.spyOn(notifications, 'success');
 
     fixture = TestBed.createComponent(NoteEdit);
     component = fixture.componentInstance;
@@ -72,7 +76,7 @@ describe('NoteEdit', () => {
     request.flush(makeResponse());
   });
 
-  it('saves again instead of navigating when a section is deleted during a save', () => {
+  it('saves again when a section is deleted during a save', () => {
     component.note = makeNote();
 
     component.save();
@@ -91,8 +95,29 @@ describe('NoteEdit', () => {
 
     expect(component.saving).toBe(false);
     expect(component.dirty).toBe(false);
-    expect(router.navigate).toHaveBeenCalledTimes(1);
-    expect(router.navigate).toHaveBeenCalledWith(['/notes', 'note-1']);
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(notifications.success).toHaveBeenCalledWith('Note updated.');
+  });
+
+  it('keeps the editor open and applies the saved response', () => {
+    component.note = makeNote();
+    component.touch();
+
+    component.save();
+
+    const request = httpMock.expectOne(updateUrl);
+    request.flush({
+      ...makeResponse(),
+      title: 'Updated C#',
+      tags: ['dotnet', 'csharp']
+    });
+
+    expect(component.note.title).toBe('Updated C#');
+    expect(component.note.tags).toEqual(['dotnet', 'csharp']);
+    expect(component.tagsInput).toBe('dotnet, csharp');
+    expect(component.dirty).toBe(false);
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(notifications.success).toHaveBeenCalledWith('Note updated.');
   });
 
   it('resets saving and keeps the error when an update fails', () => {

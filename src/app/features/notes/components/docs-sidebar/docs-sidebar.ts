@@ -61,6 +61,10 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['notes']) {
+      this.sectionCache.clear();
+    }
+
     if (changes['notes'] || changes['currentNoteId']) {
       this.activeAnchor.set('');
       this.collapsedSections.set(new Set());
