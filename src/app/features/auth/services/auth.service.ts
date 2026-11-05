@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, finalize, shareReplay, tap } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthResponse } from '../models/auth-response.model';
 import { LoginRequest } from '../models/login-request.model';
@@ -17,6 +17,7 @@ export class AuthService {
   private _accessToken = this.readToken();
   private _user = this.readUser();
   private refreshRequest$: Observable<AuthResponse> | null = null;
+  private restoreRequest$: Observable<boolean> | null = null;
 
   get accessToken(): string {
     return this._accessToken;
@@ -67,6 +68,30 @@ export class AuthService {
     return this.refreshRequest$;
   }
 
+  restoreSession(): Observable<boolean> {
+    if (this._accessToken) {
+      return of(true);
+    }
+
+    if (this.restoreRequest$) {
+      return this.restoreRequest$;
+    }
+
+    this.restoreRequest$ = this.refreshToken().pipe(
+      map(() => true),
+      catchError(() => {
+        this.clearAuth();
+        return of(false);
+      }),
+      finalize(() => {
+        this.restoreRequest$ = null;
+      }),
+      shareReplay(1)
+    );
+
+    return this.restoreRequest$;
+  }
+
   getMe(): Observable<MeResponse> {
     return this.http.get<MeResponse>(`${this.apiUrl}/me`).pipe(
       tap(user => {
@@ -86,6 +111,7 @@ export class AuthService {
     this._accessToken = '';
     this._user = null;
     this.refreshRequest$ = null;
+    this.restoreRequest$ = null;
 
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem(this.tokenKey);

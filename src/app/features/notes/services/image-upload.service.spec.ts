@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
+import { environment } from '../../../../environments/environment';
 import { ImageUploadService } from './image-upload.service';
 import { testProviders } from '../../../testing/test-providers';
 
@@ -18,7 +19,7 @@ describe('ImageUploadService', () => {
       response = value;
     });
 
-    const request = httpMock.expectOne('https://localhost:7029/api/v1/images');
+    const request = httpMock.expectOne(`${environment.apiUrl}/images`);
     expect(request.request.method).toBe('POST');
     expect(request.request.body instanceof FormData).toBe(true);
     expect((request.request.body as FormData).get('file')).toBe(file);

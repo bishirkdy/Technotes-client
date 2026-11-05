@@ -73,6 +73,39 @@ describe('httpInterceptor', () => {
     retried.flush(user);
   });
 
+  it('refreshes and retries when the access token is missing', () => {
+    service.clearAuth();
+    service.getMe().subscribe(result => expect(result).toEqual(user));
+
+    const profile = http.expectOne(`${authBase}/me`);
+    expect(profile.request.headers.has('Authorization')).toBe(false);
+    profile.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    const refresh = http.expectOne(`${authBase}/refresh`);
+    expect(refresh.request.withCredentials).toBe(true);
+    refresh.flush(refreshed);
+
+    const retried = http.expectOne(`${authBase}/me`);
+    expect(retried.request.headers.get('Authorization')).toBe('Bearer new-token');
+    retried.flush(user);
+  });
+
+  it('keeps the refreshed session when the retried request fails', () => {
+    service.getMe().subscribe({ error: () => undefined });
+
+    const profile = http.expectOne(`${authBase}/me`);
+    profile.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    const refresh = http.expectOne(`${authBase}/refresh`);
+    refresh.flush(refreshed);
+
+    const retried = http.expectOne(`${authBase}/me`);
+    retried.flush({}, { status: 500, statusText: 'Server Error' });
+
+    expect(service.accessToken).toBe('new-token');
+    expect(service.user).not.toBeNull();
+  });
+
   it('clears the session when refreshing the profile token fails', () => {
     service.getMe().subscribe({ error: () => undefined });
 
