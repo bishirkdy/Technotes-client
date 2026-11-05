@@ -1,6 +1,6 @@
 export interface AuthResponse {
-  accessToken: string | null;
   accessTokenExpiresAtUtc: string;
+  csrfToken: string;
   userId: string;
   userName: string | null;
   email: string | null;

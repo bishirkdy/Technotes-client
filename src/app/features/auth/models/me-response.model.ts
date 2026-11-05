@@ -3,4 +3,6 @@ export interface MeResponse {
   userName: string | null;
   email: string | null;
   roles: string[];
+  accessTokenExpiresAtUtc: string | null;
+  csrfToken: string;
 }
