@@ -1,4 +1,4 @@
 export const environment = {
-  apiUrl: '/api/v1',
-  production: false
+  production: true,
+  apiUrl: 'https://scribly-api.onrender.com/api/v1'
 };
