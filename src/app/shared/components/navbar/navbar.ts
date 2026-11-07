@@ -131,10 +131,15 @@ export class Navbar implements OnInit, OnDestroy {
     }
 
     if (typeof window.matchMedia === 'function') {
-      return window.matchMedia('(max-width: 1023px)').matches;
+      return window.matchMedia(
+        '(max-width: 1023px), (orientation: landscape) and (max-height: 38.75rem)'
+      ).matches;
     }
 
-    return window.innerWidth < 1024;
+    return (
+      window.innerWidth < 1024 ||
+      (window.innerWidth > window.innerHeight && window.innerHeight <= 620)
+    );
   }
 
   private currentScrollY(): number {

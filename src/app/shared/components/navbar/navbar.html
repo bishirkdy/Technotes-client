@@ -1,11 +1,11 @@
-﻿<header
+<header
   class="navbar-header sticky top-0 z-50 px-4 pt-4 sm:px-6"
   [class.navbar-hidden]="headerHidden()"
   [attr.inert]="headerHidden() ? '' : null"
   [attr.aria-hidden]="headerHidden() ? 'true' : null"
 >
-  <nav class="page-shell glass-panel flex h-16 items-center justify-between gap-4 rounded-full px-4 max-md:ml-auto max-md:mr-0 max-md:h-14 max-md:w-14 max-md:justify-center max-md:px-0 sm:px-6">
-    <a routerLink="/" (click)="closeMenu()" class="group hidden shrink-0 items-center gap-3 md:flex">
+  <nav class="navbar-shell page-shell glass-panel flex h-16 items-center justify-between gap-4 rounded-full px-4 max-lg:ml-auto max-lg:mr-0 max-lg:h-14 max-lg:w-14 max-lg:justify-center max-lg:px-0 sm:px-6">
+    <a routerLink="/" (click)="closeMenu()" class="navbar-desktop navbar-brand group hidden shrink-0 items-center gap-3 lg:flex">
       <img
         src="logo.png"
         alt=""
@@ -14,7 +14,7 @@
       <span class="text-base font-semibold tracking-[-0.03em] text-mist-50">Scribly</span>
     </a>
 
-    <div class="hidden items-center gap-7 md:flex">
+    <div class="navbar-desktop hidden items-center gap-7 lg:flex">
       <a routerLink="/" routerLinkActive="nav-link-active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">Home</a>
       <a routerLink="/notes" routerLinkActive="nav-link-active" class="nav-link">Docs</a>
       <a routerLink="/learn" routerLinkActive="nav-link-active" class="nav-link">Reading room</a>
@@ -23,7 +23,7 @@
       }
     </div>
 
-    <div class="hidden items-center gap-2 md:flex">
+    <div class="navbar-desktop hidden items-center gap-2 lg:flex">
       <form (submit)="search($event)" role="search" class="hidden lg:block">
         <label for="docs-search" class="sr-only">Search docs</label>
         <input
@@ -49,7 +49,7 @@
       }
     </div>
 
-    <button type="button" class="icon-button shrink-0 md:hidden" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()" aria-label="Toggle navigation">
+    <button type="button" class="navbar-mobile-toggle icon-button shrink-0 lg:hidden" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()" aria-label="Toggle navigation">
       @if (menuOpen()) {
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
@@ -63,7 +63,7 @@
   </nav>
 
   @if (menuOpen()) {
-    <div class="page-shell mt-2 md:hidden">
+    <div class="navbar-mobile-menu page-shell mt-2 max-h-[calc(100vh-6rem)] overflow-y-auto lg:hidden">
       <div class="glass-panel rounded-3xl p-3">
         <form (submit)="search($event)" role="search" class="mb-2">
           <label for="docs-search-mobile" class="sr-only">Search docs</label>

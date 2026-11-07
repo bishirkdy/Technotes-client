@@ -7,11 +7,13 @@ describe('Navbar', () => {
   let component: Navbar;
   let fixture: ComponentFixture<Navbar>;
   let originalInnerWidth: number;
+  let originalInnerHeight: number;
   let originalMatchMedia: typeof window.matchMedia;
   let originalScrollY: number;
 
   beforeEach(async () => {
     originalInnerWidth = window.innerWidth;
+    originalInnerHeight = window.innerHeight;
     originalMatchMedia = window.matchMedia;
     originalScrollY = window.scrollY;
 
@@ -35,6 +37,11 @@ describe('Navbar', () => {
       configurable: true,
       writable: true,
       value: originalInnerWidth
+    });
+    Object.defineProperty(window, 'innerHeight', {
+      configurable: true,
+      writable: true,
+      value: originalInnerHeight
     });
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
@@ -90,20 +97,37 @@ describe('Navbar', () => {
 
     expect(component.headerHidden()).toBe(false);
   });
+
+  it('auto-hides on short landscape viewports even when wide', async () => {
+    fixture.componentRef.setInput('autoHide', true);
+    setViewport(1280, 500);
+
+    setScrollY(400);
+    window.dispatchEvent(new Event('scroll'));
+    await nextFrame();
+    fixture.detectChanges();
+
+    expect(component.headerHidden()).toBe(true);
+  });
 });
 
-function setViewport(width: number): void {
+function setViewport(width: number, height = 900): void {
   Object.defineProperty(window, 'innerWidth', {
     configurable: true,
     writable: true,
     value: width
+  });
+  Object.defineProperty(window, 'innerHeight', {
+    configurable: true,
+    writable: true,
+    value: height
   });
   Object.defineProperty(window, 'matchMedia', {
     configurable: true,
     writable: true,
     value: (query: string) =>
       ({
-        matches: width < 1024 && query.includes('max-width'),
+        matches: width < 1024 || (width > height && height <= 620),
         media: query,
         onchange: null,
         addListener: () => undefined,

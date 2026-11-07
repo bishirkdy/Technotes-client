@@ -26,6 +26,7 @@ describe('DocsSidebar', () => {
     fixture.componentRef.setInput('floatingTrigger', true);
     fixture.detectChanges();
     await nextFrame();
+    fixture.detectChanges();
   });
 
   afterEach(() => {
@@ -46,24 +47,7 @@ describe('DocsSidebar', () => {
     expect(component).toBeTruthy();
   });
 
-  it('shows the fixed contents trigger after the inline trigger scrolls away', async () => {
-    const inlineTrigger = fixture.nativeElement.querySelector(
-      '[data-mobile-sidebar-trigger]'
-    ) as HTMLElement;
-
-    inlineTrigger.getBoundingClientRect = () => rectWithBottom(120);
-    window.dispatchEvent(new Event('scroll'));
-    await nextFrame();
-    fixture.detectChanges();
-
-    expect(component.floatingContentsVisible()).toBe(false);
-    expect(fixture.nativeElement.querySelector('[data-floating-contents]')).toBeNull();
-
-    inlineTrigger.getBoundingClientRect = () => rectWithBottom(-10);
-    window.dispatchEvent(new Event('scroll'));
-    await nextFrame();
-    fixture.detectChanges();
-
+  it('shows the fixed contents trigger while reading and opens the drawer', () => {
     expect(component.floatingContentsVisible()).toBe(true);
 
     const floatingTrigger = fixture.nativeElement.querySelector(
@@ -75,18 +59,14 @@ describe('DocsSidebar', () => {
     fixture.detectChanges();
 
     expect(component.drawerOpen()).toBe(true);
+    expect(component.floatingContentsVisible()).toBe(false);
     expect(fixture.nativeElement.querySelector('#docs-sidebar-drawer')).toBeTruthy();
   });
 
   it('keeps the fixed trigger hidden on desktop', async () => {
     setViewport(1280);
 
-    const inlineTrigger = fixture.nativeElement.querySelector(
-      '[data-mobile-sidebar-trigger]'
-    ) as HTMLElement;
-    inlineTrigger.getBoundingClientRect = () => rectWithBottom(-10);
-
-    window.dispatchEvent(new Event('scroll'));
+    window.dispatchEvent(new Event('resize'));
     await nextFrame();
     fixture.detectChanges();
 
@@ -116,20 +96,6 @@ function setViewport(width: number): void {
         dispatchEvent: () => false
       }) as unknown as MediaQueryList
   });
-}
-
-function rectWithBottom(bottom: number): DOMRect {
-  return {
-    bottom,
-    top: bottom - 50,
-    height: 50,
-    left: 0,
-    right: 300,
-    width: 300,
-    x: 0,
-    y: bottom - 50,
-    toJSON: () => ({})
-  } as DOMRect;
 }
 
 async function nextFrame(): Promise<void> {

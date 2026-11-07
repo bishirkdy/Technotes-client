@@ -227,24 +227,11 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
   }
 
   private updateFloatingContents(): void {
-    if (!this.floatingTrigger) {
-      if (this.floatingContentsVisible()) {
-        this.floatingContentsVisible.set(false);
-      }
-      return;
-    }
-
-    if (typeof document === 'undefined' || this.drawerOpen() || this.isDesktopViewport()) {
-      if (this.floatingContentsVisible()) {
-        this.floatingContentsVisible.set(false);
-      }
-      return;
-    }
-
-    const trigger = this.host.nativeElement.querySelector<HTMLElement>(
-      '[data-mobile-sidebar-trigger]'
-    );
-    const shouldShow = !!trigger && trigger.getBoundingClientRect().bottom <= 0;
+    const shouldShow =
+      this.floatingTrigger &&
+      typeof document !== 'undefined' &&
+      !this.drawerOpen() &&
+      !this.isDesktopViewport();
 
     if (this.floatingContentsVisible() !== shouldShow) {
       this.floatingContentsVisible.set(shouldShow);

@@ -1,4 +1,4 @@
-<app-navbar />
+<app-navbar [autoHide]="true" />
 
 <main class="page-shell py-12 sm:py-16">
   <div class="grid items-start gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
@@ -7,6 +7,7 @@
       [currentNoteId]="note?.id || ''"
       [currentCategory]="note?.categoryName || topic"
       [singleNote]="true"
+      [floatingTrigger]="true"
       mode="learn"
     />
 
