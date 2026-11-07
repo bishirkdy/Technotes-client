@@ -34,10 +34,12 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
   @Input() currentCategory = '';
   @Input() mode: 'docs' | 'learn' = 'docs';
   @Input() singleNote = false;
+  @Input() floatingTrigger = false;
 
   readonly query = signal('');
   readonly activeAnchor = signal('');
   readonly drawerOpen = signal(false);
+  readonly floatingContentsVisible = signal(false);
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
   private readonly collapsedSections = signal<Set<string>>(new Set());
@@ -70,7 +72,16 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
     if (changes['notes'] || changes['currentNoteId']) {
       this.activeAnchor.set('');
       this.collapsedSections.set(new Set());
+      this.floatingContentsVisible.set(false);
       this.scheduleActiveUpdate();
+    }
+
+    if (changes['floatingTrigger']) {
+      if (!this.floatingTrigger) {
+        this.floatingContentsVisible.set(false);
+      } else {
+        this.scheduleActiveUpdate();
+      }
     }
   }
 
@@ -99,9 +110,10 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   onResize(): void {
-    if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) {
+    if (this.isDesktopViewport()) {
       this.closeDrawer();
     }
+    this.scheduleActiveUpdate();
   }
 
   openDrawer(): void {
@@ -109,6 +121,7 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
       this.previousBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
     }
+    this.floatingContentsVisible.set(false);
     this.drawerOpen.set(true);
   }
 
@@ -118,6 +131,7 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
     }
     this.drawerOpen.set(false);
     this.unlockBodyScroll();
+    this.scheduleActiveUpdate();
   }
 
   noteRoute(note: NoteResponse): string[] {
@@ -200,12 +214,53 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
     }
 
     if (typeof requestAnimationFrame === 'undefined') {
+      this.updateFloatingContents();
       this.updateActiveSection();
       return;
     }
 
     cancelAnimationFrame(this.frame);
-    this.frame = requestAnimationFrame(() => this.updateActiveSection());
+    this.frame = requestAnimationFrame(() => {
+      this.updateFloatingContents();
+      this.updateActiveSection();
+    });
+  }
+
+  private updateFloatingContents(): void {
+    if (!this.floatingTrigger) {
+      if (this.floatingContentsVisible()) {
+        this.floatingContentsVisible.set(false);
+      }
+      return;
+    }
+
+    if (typeof document === 'undefined' || this.drawerOpen() || this.isDesktopViewport()) {
+      if (this.floatingContentsVisible()) {
+        this.floatingContentsVisible.set(false);
+      }
+      return;
+    }
+
+    const trigger = this.host.nativeElement.querySelector<HTMLElement>(
+      '[data-mobile-sidebar-trigger]'
+    );
+    const shouldShow = !!trigger && trigger.getBoundingClientRect().bottom <= 0;
+
+    if (this.floatingContentsVisible() !== shouldShow) {
+      this.floatingContentsVisible.set(shouldShow);
+    }
+  }
+
+  private isDesktopViewport(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    if (typeof window.matchMedia === 'function') {
+      return window.matchMedia('(min-width: 1024px)').matches;
+    }
+
+    return window.innerWidth >= 1024;
   }
 
   private updateActiveSection(): void {

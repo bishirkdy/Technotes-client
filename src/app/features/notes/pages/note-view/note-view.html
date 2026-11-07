@@ -1,4 +1,4 @@
-<app-navbar />
+<app-navbar [autoHide]="true" />
 
 @if (loading) {
   <main class="page-shell py-10">
@@ -29,6 +29,7 @@
         [currentNoteId]="note.id"
         [currentCategory]="category"
         [singleNote]="true"
+        [floatingTrigger]="true"
       />
 
       <article class="min-w-0">

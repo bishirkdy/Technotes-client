@@ -24,6 +24,13 @@
   color: rgb(190 242 100);
 }
 
+.docs-floating-contents {
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  right: calc(1rem + env(safe-area-inset-right));
+  max-width: calc(100vw - 2rem);
+  animation: docs-floating-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .docs-drawer-backdrop {
   animation: docs-drawer-fade 160ms ease-out;
 }
@@ -34,6 +41,13 @@
 
 .docs-drawer-panel .docs-nav-scroll {
   max-height: none;
+}
+
+@keyframes docs-floating-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.96);
+  }
 }
 
 @keyframes docs-drawer-fade {
@@ -49,6 +63,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .docs-floating-contents,
   .docs-drawer-backdrop,
   .docs-drawer-panel {
     animation: none;
