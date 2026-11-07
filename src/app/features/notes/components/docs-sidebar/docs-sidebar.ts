@@ -37,12 +37,14 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
 
   readonly query = signal('');
   readonly activeAnchor = signal('');
+  readonly drawerOpen = signal(false);
 
   private readonly collapsedGroups = signal<Set<string>>(new Set());
   private readonly collapsedSections = signal<Set<string>>(new Set());
   private readonly sectionCache = new Map<string, FlatNoteSection[]>();
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private frame = 0;
+  private previousBodyOverflow = '';
 
   get groups() {
     const source = this.currentCategory
@@ -80,11 +82,42 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
     if (typeof cancelAnimationFrame !== 'undefined') {
       cancelAnimationFrame(this.frame);
     }
+    if (this.drawerOpen()) {
+      this.unlockBodyScroll();
+    }
   }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
     this.scheduleActiveUpdate();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeDrawer();
+  }
+
+  @HostListener('window:resize')
+  onResize(): void {
+    if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) {
+      this.closeDrawer();
+    }
+  }
+
+  openDrawer(): void {
+    if (typeof document !== 'undefined') {
+      this.previousBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
+    this.drawerOpen.set(true);
+  }
+
+  closeDrawer(): void {
+    if (!this.drawerOpen()) {
+      return;
+    }
+    this.drawerOpen.set(false);
+    this.unlockBodyScroll();
   }
 
   noteRoute(note: NoteResponse): string[] {
@@ -153,6 +186,12 @@ export class DocsSidebar implements OnChanges, AfterViewInit, OnDestroy {
       }
       return next;
     });
+  }
+
+  private unlockBodyScroll(): void {
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = this.previousBodyOverflow;
+    }
   }
 
   private scheduleActiveUpdate(): void {

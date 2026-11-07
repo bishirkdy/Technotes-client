@@ -23,3 +23,34 @@
   background: rgb(163 230 53 / 0.1);
   color: rgb(190 242 100);
 }
+
+.docs-drawer-backdrop {
+  animation: docs-drawer-fade 160ms ease-out;
+}
+
+.docs-drawer-panel {
+  animation: docs-drawer-slide 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.docs-drawer-panel .docs-nav-scroll {
+  max-height: none;
+}
+
+@keyframes docs-drawer-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes docs-drawer-slide {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-drawer-backdrop,
+  .docs-drawer-panel {
+    animation: none;
+  }
+}
